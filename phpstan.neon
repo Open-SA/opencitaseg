@@ -1,0 +1,19 @@
+includes:
+	- vendor/glpi-project/phpstan-glpi/extension.neon
+
+parameters:
+    level: 0
+    paths:
+        - src
+        - hook.php
+        - setup.php
+    scanDirectories:
+        - ../../inc
+        - ../../src
+
+
+    # for GLPI 10.x the following configuration entries must be used
+    bootstrapFiles:
+        - ../../inc/based_config.php
+    stubFiles:
+        - stubs/glpi_constants.php

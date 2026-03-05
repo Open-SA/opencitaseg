@@ -1,0 +1,57 @@
+<root>
+   <name>opencitaseg</name>
+   <key>opencitaseg</key>
+   <!-- stable, beta, development, alpha, ... -->
+   <state>stable</state>
+   <logo>https://raw.githubusercontent.com/pluginsGLPI/opencitaseg/main/opencitaseg.png</logo>
+   <description>
+      <short>
+         <!-- Add as many lang tag you want -->
+         <en>opencitaseg GLPI plugin</en>
+         <fr>Plugin GLPI opencitaseg</fr>
+      </short>
+      <long>
+         <!-- Add as many lang tag you want -->
+         <en>A long description for opencitaseg GLPI plugin.</en>
+         <fr>Une description longue pour le plugin GLPI opencitaseg.</fr>
+      </long>
+   </description>
+   <homepage>https://github.com/pluginsGLPI/opencitaseg</homepage>
+   <download>https://github.com/pluginsGLPI/opencitaseg/releases</download>
+   <issues>https://github.com/pluginsGLPI/opencitaseg/issues</issues>
+   <readme>https://github.com/pluginsGLPI/opencitaseg/blob/main/README.md</readme>
+   <authors>
+      <!-- Add as many author tag you want -->
+      <author>Teclib'</author>
+   </authors>
+   <versions>
+      <!-- Add as many version tag you want -->
+      <version>
+         <num>0.1.0</num>
+         <!-- Add as many compatibility tag you want -->
+         <compatibility>9.4</compatibility>
+         <compatibility>9.3</compatibility>
+         <compatibility>9.2</compatibility>
+      </version>
+   </versions>
+   <langs>
+      <!-- Add as many lang tag you want -->
+      <lang>en_GB</lang>
+      <lang>fr_FR</lang>
+   </langs>
+   <license>MIT</license>
+   <!--tags>
+      <en>
+         <tag>One tag</tag>
+         <tag>Another tag</tag>
+      </en>
+      <fr>
+         <tag>Un tag</tag>
+         <tag>Un autre tag</tag>
+      </fr>
+   </tags-->
+   <!--screenshots>
+      <screenshot>https://github.com/pluginsGLPI/opencitaseg/raw/main/screenshot.png</screenshot>
+      <screenshot>https://github.com/pluginsGLPI/opencitaseg/raw/main/screenshot2.png</screenshot>
+   </screenshots-->
+</root>
