@@ -1,4 +1,6 @@
 {
+  "name": "opensa/opencitaseg",
+  "description": "Plugin para GLPI que permite citar seguimientos.",
   "require": {
     "php": ">=7.4"
   },
@@ -17,7 +19,7 @@
   },
   "autoload": {
     "psr-4": {
-      "GlpiPlugin\\OpenTareasProyectos\\": [
+      "GlpiPlugin\\Opencitaseg\\": [
         "src/",
         "inc/"
       ]
@@ -25,14 +27,14 @@
   },
   "scripts": {
     "post-install-cmd": [
-        "git config core.hooksPath .git-hooks",
-        "chmod +x .git-hooks/pre-commit",
-        "echo 'Git hooks configured \\n';"
+      "git config core.hooksPath .git-hooks",
+      "chmod +x .git-hooks/pre-commit",
+      "echo 'Git hooks configured \\n';"
     ],
     "post-update-cmd": [
-        "git config core.hooksPath .git-hooks",
-        "chmod +x .git-hooks/pre-commit",
-        "echo 'Git hooks configured \\n';"
+      "git config core.hooksPath .git-hooks",
+      "chmod +x .git-hooks/pre-commit",
+      "echo 'Git hooks configured \\n';"
     ]
   }
 }
