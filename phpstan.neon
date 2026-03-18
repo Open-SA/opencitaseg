@@ -13,6 +13,7 @@ parameters:
 
 
     # for GLPI 11.x the following configuration entries must be used
+    #prueba
     bootstrapFiles:
         - ../../vendor/autoload.php
     stubFiles:
