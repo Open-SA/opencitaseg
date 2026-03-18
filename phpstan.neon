@@ -12,8 +12,8 @@ parameters:
         - ../../src
 
 
-    # for GLPI 10.x the following configuration entries must be used
+    # for GLPI 11.x the following configuration entries must be used
     bootstrapFiles:
-        - ../../inc/based_config.php
+        - ../../vendor/autoload.php
     stubFiles:
         - stubs/glpi_constants.php
