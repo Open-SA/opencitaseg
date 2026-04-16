@@ -23,7 +23,8 @@
  * @copyright Copyright (C) 2013-2026 by opencitaseg plugin team.
  * @license   GPLv2 https://www.gnu.org/licenses/gpl-2.0.html
  * @link      https://github.com/Open-SA/opencitaseg
- * ------------------------------------------------------------------------- */
+ * -------------------------------------------------------------------------
+ */
 
 document.addEventListener("DOMContentLoaded", function () {
   function inyectarBotones() {
