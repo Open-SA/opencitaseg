@@ -10,7 +10,7 @@
  * opencitaseg is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * any later version.
+ * (at your option) any later version.
  *
  * opencitaseg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,7 +22,7 @@
  * -------------------------------------------------------------------------
  * @copyright Copyright (C) 2013-2023 by opencitaseg plugin team.
  * @license   GPLv2 https://www.gnu.org/licenses/gpl-2.0.html
- * @link      https://github.com/pluginsGLPI/opencitaseg
+ * @link      https://github.com/Open-SA/opencitaseg
  * -------------------------------------------------------------------------
  */
 
