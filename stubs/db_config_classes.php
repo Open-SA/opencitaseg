@@ -22,7 +22,7 @@
  * You should have received a copy of the GNU General Public License
  * along with opencitaseg. If not, see <http://www.gnu.org/licenses/>.
  * -------------------------------------------------------------------------
- * @copyright Copyright (C) 2013-2023 by opencitaseg plugin team.
+ * @copyright Copyright (C) 2026 by opencitaseg plugin team.
  * @copyright 2015-2025 Teclib' and contributors.
  * @licence   https://www.gnu.org/licenses/gpl-3.0.html
  * @license   GPLv2 https://www.gnu.org/licenses/gpl-2.0.html
@@ -32,10 +32,12 @@
 // This file contains class stubs for the DB config classes.
 // It permits to indicates to PHPStan and IDEs that the `DB` and the `DBSlave` classes are extending the `DBmysql` class.
 
-if (!class_exists('DB', false)) {
-    class DB extends DBmysql {}
+if (! class_exists('DB', false)) {
+    class DB extends DBmysql
+    {}
 }
 
-if (!class_exists('DBSlave', false)) {
-    class DBSlave extends DBmysql {}
+if (! class_exists('DBSlave', false)) {
+    class DBSlave extends DBmysql
+    {}
 }
