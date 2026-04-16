@@ -22,10 +22,11 @@
  * You should have received a copy of the GNU General Public License
  * along with opencitaseg. If not, see <http://www.gnu.org/licenses/>.
  * -------------------------------------------------------------------------
- * @copyright Copyright (C) 2026 by opencitaseg plugin team.
+ * @copyright Copyright (C) 2013-2023 by opencitaseg plugin team.
  * @license   GPLv2 https://www.gnu.org/licenses/gpl-2.0.html
  * @link      https://github.com/pluginsGLPI/opencitaseg
- * ------------------------------------------------------------------------- */
+ * -------------------------------------------------------------------------
+ */
 
 namespace GlpiPlugin\Opencitaseg;
 

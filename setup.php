@@ -22,10 +22,11 @@
  * You should have received a copy of the GNU General Public License
  * along with opencitaseg. If not, see <http://www.gnu.org/licenses/>.
  * -------------------------------------------------------------------------
- * @copyright Copyright (C) 2026 by opencitaseg plugin team.
+ * @copyright Copyright (C) 2013-2023 by opencitaseg plugin team.
  * @license   GPLv2 https://www.gnu.org/licenses/gpl-2.0.html
  * @link      https://github.com/pluginsGLPI/opencitaseg
- * ------------------------------------------------------------------------- */
+ * -------------------------------------------------------------------------
+ */
 
 define('PLUGIN_OPENCITASEG_VERSION', '1.0.0');
 
@@ -75,9 +76,9 @@ function plugin_version_opencitaseg(): array
     return [
         'name'         => 'opencitaseg',
         'version'      => PLUGIN_OPENCITASEG_VERSION,
-        'author'       => '<a href="http://www.teclib.com">Teclib\'</a>',
-        'license'      => '',
-        'homepage'     => '',
+        'author'       => '<a href="http://www.opensa.com.ar">OPENSA\'</a>',
+        'license'      => 'GPLv2+',
+        'homepage'     => 'https://github.com/Open-SA/opencitaseg',
         'requirements' => [
             'glpi' => [
                 'min' => PLUGIN_OPENCITASEG_MIN_GLPI_VERSION,
