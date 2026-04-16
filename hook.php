@@ -34,7 +34,6 @@ function plugin_opencitaseg_install()
 
     $table = 'glpi_plugin_opencitaseg_cites';
 
-    // Si la tabla no existe, la creamos
     if (! $DB->tableExists($table)) {
         $query = "CREATE TABLE `$table` (
             `id` bigint unsigned NOT NULL AUTO_INCREMENT,
@@ -63,12 +62,9 @@ function plugin_opencitaseg_uninstall()
     return true;
 }
 
-// Esta función se ejecuta justo después de que GLPI guarda un nuevo seguimiento
 function plugin_opencitaseg_item_add($item)
 {
-    // Verificamos si la variable existe en el POST enviado por nuestro futuro JavaScript
     if (isset($_POST['_quoted_followup_id']) && ! empty($_POST['_quoted_followup_id'])) {
-        // Instanciamos nuestra clase y guardamos la relación
         $cite = new \GlpiPlugin\Opencitaseg\Cite();
         $cite->add([
             'itilfollowups_id_source' => $item->fields['id'],

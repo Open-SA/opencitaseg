@@ -25,13 +25,10 @@
       <author>Teclib'</author>
    </authors>
    <versions>
-      <!-- Add as many version tag you want -->
       <version>
-         <num>0.1.0</num>
-         <!-- Add as many compatibility tag you want -->
-         <compatibility>9.4</compatibility>
-         <compatibility>9.3</compatibility>
-         <compatibility>9.2</compatibility>
+         <num>1.0.0</num>
+         <compatibility>~11.0.0</compatibility>
+         <download_url>https://github.com/pluginsGLPI/opencitaseg/releases/download/v1.0.0/opencitaseg-1.0.0.tar.gz</download_url>
       </version>
    </versions>
    <langs>

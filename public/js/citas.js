@@ -39,7 +39,6 @@ document.addEventListener("DOMContentLoaded", function () {
   observer.observe(document.body, { childList: true, subtree: true });
 
   document.body.addEventListener("click", function (e) {
-    // --- Navegación al hacer clic en una cita guardada ---
     const enlaceNavegacion = e.target.closest('a[href^="#ITILFollowup_"]');
     if (enlaceNavegacion) {
       e.preventDefault();
@@ -63,7 +62,6 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    // --- Al hacer clic en el botón "Citar" ---
     const botonCitar = e.target.closest(".btn-citar-seguimiento");
     if (!botonCitar) return;
 
@@ -117,9 +115,6 @@ document.addEventListener("DOMContentLoaded", function () {
             autorCita = autorNodo.textContent.trim();
           }
         }
-
-        // --- CAMBIOS AQUI ---
-        // Agregamos clases nativas de TinyMCE y trucos CSS para bloquear la edición
         const htmlCita = `
                     <blockquote contenteditable="false" class="mceNonEditable" style="border-left: 3px solid #0078d4; padding-left: 10px; margin-left: 0; color: #555; background-color: #f8f9fa; padding: 10px; border-radius: 4px; user-select: none;">
                         <strong><a href="#ITILFollowup_${idSeguimiento}" style="text-decoration: none; color: #0078d4;">
@@ -138,22 +133,17 @@ document.addEventListener("DOMContentLoaded", function () {
           const editor = tinymce.get(textarea.id);
 
           if (editor) {
-            // 1. Hacemos scroll hacia el formulario
             document
               .getElementById("new-itilobject-form")
               .scrollIntoView({ behavior: "smooth", block: "center" });
 
-            // 2. Le damos foco al editor de forma activa
             editor.focus();
 
-            // 3. Movemos el cursor al final del documento (por si ya había texto escrito)
             editor.selection.select(editor.getBody(), true);
             editor.selection.collapse(false);
 
-            // 4. Insertamos la cita. Este comando automáticamente deja el cursor DESPUÉS de la inserción.
             editor.execCommand("mceInsertContent", false, htmlCita);
 
-            // 5. Pequeño empujón extra para asegurar el foco en el nuevo párrafo vacío
             editor.selection.collapse(false);
           } else {
             console.error("TinyMCE no reconoció el ID: " + textarea.id);

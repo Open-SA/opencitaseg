@@ -46,12 +46,10 @@ function plugin_init_opencitaseg(): void
 
     $PLUGIN_HOOKS['csrf_compliant']['opencitaseg'] = true;
 
-    // 1. Hook para capturar cuando se añade un seguimiento
     $PLUGIN_HOOKS['item_add']['opencitaseg'] = [
         'ITILFollowup' => 'plugin_opencitaseg_item_add',
     ];
 
-    // 2. Hook para cargar nuestro JavaScript en todas las páginas (el JS filtrará si está en un ticket)
     $PLUGIN_HOOKS['add_javascript']['opencitaseg'] = ['js/citas.js'];
 }
 
