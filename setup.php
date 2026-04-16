@@ -28,6 +28,49 @@
  * -------------------------------------------------------------------------
  */
 
+define('PLUGIN_OPENCITASEG_VERSION', '1.0.0');
+
+// Minimal GLPI version, inclusive
+define("PLUGIN_OPENCITASEG_MIN_GLPI_VERSION", "11.0.0");
+
+// Maximum GLPI version, exclusive
+define("PLUGIN_OPENCITASEG_MAX_GLPI_VERSION", "11.0.99");
+
+/**
+ * Init hooks of the plugin.
+ * REQUIRED
+ */
+function plugin_init_opencitaseg(): void
+{
+    global $PLUGIN_HOOKS;
+
+    $PLUGIN_HOOKS['csrf_compliant']['opencitaseg'] = true;
+
+    $PLUGIN_HOOKS['item_add']['opencitaseg'] = [
+        'ITILFollowup' => 'plugin_opencitaseg_item_add',
+    ];
+
+    $PLUGIN_HOOKS['add_javascript']['opencitaseg'] = ['js/citas.js'];
+}
+
+/**
+ * Get the name and the version of the plugin
+ * REQUIRED
+ *
+ * @return array{
+ *      name: string,
+ *      version: string,
+ *      author: string,
+ *      license: string,
+ *      homepage: string,
+ *      requirements: array{
+ *          glpi: array{
+ *              min: string,
+ *              max: string,
+ *          }
+ *      }
+ * }
+ */
 function plugin_version_opencitaseg(): array
 {
     return [
