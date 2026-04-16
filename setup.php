@@ -26,7 +26,8 @@
  * @license   GPLv2 https://www.gnu.org/licenses/gpl-2.0.html
  * @link      https://github.com/Open-SA/opencitaseg
  * @link      https://github.com/pluginsGLPI/opencitaseg
- * ------------------------------------------------------------------------- */
+ * -------------------------------------------------------------------------
+ */
 
 define('PLUGIN_OPENCITASEG_VERSION', '1.0.0');
 
