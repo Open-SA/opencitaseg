@@ -22,17 +22,5 @@
         "inc/"
       ]
     }
-  },
-  "scripts": {
-    "post-install-cmd": [
-      "git config core.hooksPath .git-hooks",
-      "chmod +x .git-hooks/pre-commit",
-      "echo 'Git hooks configured \\n';"
-    ],
-    "post-update-cmd": [
-      "git config core.hooksPath .git-hooks",
-      "chmod +x .git-hooks/pre-commit",
-      "echo 'Git hooks configured \\n';"
-    ]
   }
 }

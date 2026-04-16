@@ -1,36 +1,33 @@
 <?php
 
 /**
- * ---------------------------------------------------------------------
- *
- * GLPI - Gestionnaire Libre de Parc Informatique
- *
- * http://glpi-project.org
- *
- * @copyright 2015-2025 Teclib' and contributors.
- * @licence   https://www.gnu.org/licenses/gpl-3.0.html
- *
- * ---------------------------------------------------------------------
+ * -------------------------------------------------------------------------
+ * opencitaseg plugin for GLPI
+ * -------------------------------------------------------------------------
  *
  * LICENSE
  *
- * This file is part of GLPI.
+ * This file is part of opencitaseg.
  *
- * This program is free software: you can redistribute it and/or modify
+ * opencitaseg is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation; either version 2 of the License, or
+ * any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * opencitaseg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- *
- * ---------------------------------------------------------------------
- */
+ * along with opencitaseg. If not, see <http://www.gnu.org/licenses/>.
+ * -------------------------------------------------------------------------
+ * @copyright Copyright (C) 2013-2023 by opencitaseg plugin team.
+ * @copyright 2015-2025 Teclib' and contributors.
+ * @licence   https://www.gnu.org/licenses/gpl-3.0.html
+ * @license   GPLv2 https://www.gnu.org/licenses/gpl-2.0.html
+ * @link      https://github.com/pluginsGLPI/opencitaseg
+ * ------------------------------------------------------------------------- */
 
 // This file contains stubs for GLPI constants.
 // Please try to keep them alphabetically ordered.
