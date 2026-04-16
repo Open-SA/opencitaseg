@@ -10,7 +10,8 @@ parameters:
     scanDirectories:
         - ../../inc
         - ../../src
-
+    ignoreErrors:
+        - '#Class GlpiPlugin\\Opencitaseg\\Cite extends unknown class CommonDBTM\.#'
 
     # for GLPI 11.x the following configuration entries must be used
     #prueba
