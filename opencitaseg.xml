@@ -1,54 +1,35 @@
 <root>
    <name>opencitaseg</name>
    <key>opencitaseg</key>
-   <!-- stable, beta, development, alpha, ... -->
    <state>stable</state>
-   <logo>https://raw.githubusercontent.com/pluginsGLPI/opencitaseg/main/opencitaseg.png</logo>
+   <logo>https://raw.githubusercontent.com/Open-SA/opencitaseg/main/opencitaseg.png</logo>
    <description>
       <short>
-         <!-- Add as many lang tag you want -->
          <en>opencitaseg GLPI plugin</en>
-         <fr>Plugin GLPI opencitaseg</fr>
+         <es>Plugin de citas para seguimientos de GLPI</es>
       </short>
       <long>
-         <!-- Add as many lang tag you want -->
-         <en>A long description for opencitaseg GLPI plugin.</en>
-         <fr>Une description longue pour le plugin GLPI opencitaseg.</fr>
+         <en>Allows quoting ITIL follow-ups in GLPI tickets.</en>
+         <es>Permite citar seguimientos ITIL en los tickets de GLPI.</es>
       </long>
    </description>
-   <homepage>https://github.com/pluginsGLPI/opencitaseg</homepage>
-   <download>https://github.com/pluginsGLPI/opencitaseg/releases</download>
-   <issues>https://github.com/pluginsGLPI/opencitaseg/issues</issues>
-   <readme>https://github.com/pluginsGLPI/opencitaseg/blob/main/README.md</readme>
+   <homepage>https://github.com/Open-SA/opencitaseg</homepage>
+   <download>https://github.com/Open-SA/opencitaseg/releases</download>
+   <issues>https://github.com/Open-SA/opencitaseg/issues</issues>
+   <readme>https://github.com/Open-SA/opencitaseg/blob/main/README.md</readme>
    <authors>
-      <!-- Add as many author tag you want -->
-      <author>Teclib'</author>
+      <author>Open-SA</author>
    </authors>
    <versions>
       <version>
          <num>1.0.0</num>
          <compatibility>~11.0.0</compatibility>
-         <download_url>https://github.com/pluginsGLPI/opencitaseg/releases/download/v1.0.0/opencitaseg-1.0.0.tar.gz</download_url>
+         <download_url>https://github.com/Open-SA/opencitaseg/releases/download/v1.0.0/opencitaseg-1.0.0.tar.gz</download_url>
       </version>
    </versions>
    <langs>
-      <!-- Add as many lang tag you want -->
       <lang>en_GB</lang>
-      <lang>fr_FR</lang>
+      <lang>es_ES</lang>
    </langs>
-   <license>MIT</license>
-   <!--tags>
-      <en>
-         <tag>One tag</tag>
-         <tag>Another tag</tag>
-      </en>
-      <fr>
-         <tag>Un tag</tag>
-         <tag>Un autre tag</tag>
-      </fr>
-   </tags-->
-   <!--screenshots>
-      <screenshot>https://github.com/pluginsGLPI/opencitaseg/raw/main/screenshot.png</screenshot>
-      <screenshot>https://github.com/pluginsGLPI/opencitaseg/raw/main/screenshot2.png</screenshot>
-   </screenshots-->
+   <license>GPL v2+</license>
 </root>

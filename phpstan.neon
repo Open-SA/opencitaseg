@@ -1,5 +1,5 @@
 includes:
-	- ../../vendor/glpi-project/phpstan-glpi/extension.neon
+    - ../../vendor/glpi-project/phpstan-glpi/extension.neon
 
 parameters:
     level: 0
@@ -13,9 +13,5 @@ parameters:
     excludePaths:
         - src/Cite.php
 
-    # for GLPI 11.x the following configuration entries must be used
-    #prueba
     bootstrapFiles:
         - ../../vendor/autoload.php
-    stubFiles:
-        - stubs/glpi_constants.php
