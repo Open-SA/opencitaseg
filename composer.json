@@ -6,7 +6,7 @@
   },
   "require-dev": {
     "glpi-project/tools": "^0.8",
-    "phpstan/phpstan": "^2.0",
+    "phpstan/phpstan": "^2.1",
     "glpi-project/phpstan-glpi": "^1.0",
     "squizlabs/php_codesniffer": "^4.0"
   },
