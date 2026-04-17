@@ -32,4 +32,16 @@
       <lang>es_ES</lang>
    </langs>
    <license>GPL v2+</license>
+   <tags>
+      <en>
+         <tag>quote</tag>
+         <tag>followup</tag>
+         <tag>itil</tag>
+      </en>
+      <es>
+         <tag>cita</tag>
+         <tag>seguimiento</tag>
+         <tag>itil</tag>
+      </es>
+   </tags>
 </root>
