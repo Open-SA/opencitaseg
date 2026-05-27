@@ -64,11 +64,31 @@ function plugin_opencitaseg_uninstall()
 
 function plugin_opencitaseg_item_add($item)
 {
-    if (isset($_POST['_quoted_followup_id']) && ! empty($_POST['_quoted_followup_id'])) {
-        $cite = new \GlpiPlugin\Opencitaseg\Cite();
-        $cite->add([
-            'itilfollowups_id_source' => $item->fields['id'],
-            'itilfollowups_id_target' => (int) $_POST['_quoted_followup_id'],
-        ]);
+    if (! isset($_POST['_quoted_followup_id']) || empty($_POST['_quoted_followup_id'])) {
+        return;
     }
+
+    $targetId = (int) $_POST['_quoted_followup_id'];
+
+    $targetFollowup = new ITILFollowup();
+    if (! $targetFollowup->getFromDB($targetId)) {
+        return;
+    }
+
+    if (
+        $targetFollowup->fields['itemtype'] !== $item->fields['itemtype']
+        || (int) $targetFollowup->fields['items_id'] !== (int) $item->fields['items_id']
+    ) {
+        return;
+    }
+
+    if (! $targetFollowup->canViewItem()) {
+        return;
+    }
+
+    $cite = new \GlpiPlugin\Opencitaseg\Cite();
+    $cite->add([
+        'itilfollowups_id_source' => $item->fields['id'],
+        'itilfollowups_id_target' => $targetId,
+    ]);
 }

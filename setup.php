@@ -28,7 +28,7 @@
  * -------------------------------------------------------------------------
  */
 
-define('PLUGIN_OPENCITASEG_VERSION', '1.0.0');
+define('PLUGIN_OPENCITASEG_VERSION', '1.0.1');
 
 // Minimal GLPI version, inclusive
 define("PLUGIN_OPENCITASEG_MIN_GLPI_VERSION", "11.0.0");
