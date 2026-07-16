@@ -62,34 +62,6 @@ function plugin_opencitaseg_uninstall()
     return true;
 }
 
-/**
- * Emit the translatable UI strings used by citas.js as a JS global.
- *
- * Keeping the catalogue in PHP lets the strings go through GLPI's translation
- * pipeline (`__()` / the plugin `.mo` files) and honour the connected user's
- * locale, instead of hardcoding one language in the JS asset.
- */
-function plugin_opencitaseg_post_init(): void
-{
-    if (isCommandLine()) {
-        return;
-    }
-
-    $strings = [
-        'quote'          => __('Quote', 'opencitaseg'),
-        'quote_followup' => __('Quote this followup', 'opencitaseg'),
-        // %s is replaced client-side with the quoted follow-up author's name.
-        'quoting'        => __('Quoting %s', 'opencitaseg'),
-        'user'           => __('User', 'opencitaseg'),
-    ];
-
-    echo Html::scriptBlock(
-        'window.OPENCITASEG_I18N = '
-        . json_encode($strings, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
-        . ';'
-    );
-}
-
 function plugin_opencitaseg_item_add($item)
 {
     if (! isset($_POST['_quoted_followup_id']) || empty($_POST['_quoted_followup_id'])) {

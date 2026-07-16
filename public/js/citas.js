@@ -27,12 +27,14 @@
  */
 
 document.addEventListener("DOMContentLoaded", function () {
-  // Translatable UI strings are injected from PHP (see
-  // plugin_opencitaseg_post_init() in hook.php) so they honour the user's
-  // GLPI locale. English fallbacks keep the plugin working if, for any
-  // reason, the block is not present.
-  const I18N = window.OPENCITASEG_I18N || {};
-  const t = (key, fallback) => (I18N[key] != null ? I18N[key] : fallback);
+  // Use GLPI's native client-side translation helper. GLPI loads every
+  // plugin's gettext catalogue into the global `i18n` object (see
+  // FrontEndAssetsExtension::localesJs()), so `__(msgid, 'opencitaseg')`
+  // resolves against this plugin's `.mo` files and honours the user's
+  // locale. If `__` is somehow unavailable, fall back to the msgid itself.
+  const DOMAIN = "opencitaseg";
+  const t = (msgid) =>
+    typeof window.__ === "function" ? window.__(msgid, DOMAIN) : msgid;
 
   function inyectarBotones() {
     const seguimientos = document.querySelectorAll(
@@ -53,8 +55,8 @@ document.addEventListener("DOMContentLoaded", function () {
         boton.className =
           "btn btn-sm btn-ghost-secondary btn-citar-seguimiento me-2";
         boton.setAttribute("data-id", idSeguimiento);
-        boton.title = t("quote_followup", "Quote this followup");
-        boton.innerHTML = '<i class="ti ti-quote"></i> ' + t("quote", "Quote");
+        boton.title = t("Quote this followup");
+        boton.innerHTML = '<i class="ti ti-quote"></i> ' + t("Quote");
 
         contenedorAcciones.insertBefore(boton, contenedorAcciones.firstChild);
       }
@@ -72,6 +74,32 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   observer.observe(document.body, { childList: true, subtree: true });
+
+  // Polls until the given TinyMCE editor has finished its async init, then
+  // calls onReady(editor). Calling editor.focus()/execCommand() before this
+  // (e.g. right after Bootstrap starts opening the reply panel) can hit the
+  // editor mid-initialization and throw, so this replaces a flat delay with
+  // an actual readiness check.
+  function esperarEditor(textareaId, onReady, onTimeout, intentosRestantes = 30) {
+    const editor = typeof tinymce !== "undefined" ? tinymce.get(textareaId) : null;
+
+    if (editor && editor.initialized) {
+      onReady(editor);
+      return;
+    }
+
+    if (intentosRestantes <= 0) {
+      onTimeout();
+      return;
+    }
+
+    setTimeout(
+      () => esperarEditor(textareaId, onReady, onTimeout, intentosRestantes - 1),
+      100,
+    );
+  }
+
+  let citaOperacionEnCurso = false;
 
   document.body.addEventListener("click", function (e) {
     const enlaceNavegacion = e.target.closest('a[href^="#ITILFollowup_"]');
@@ -99,68 +127,68 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!botonCitar) return;
 
     e.preventDefault();
+
+    // Guard against a second click landing while a previous citation is
+    // still being inserted (e.g. the user re-clicking after seeing the
+    // panel take a moment to open) — without this, both clicks would each
+    // insert their own copy of the quote.
+    if (citaOperacionEnCurso) return;
+    citaOperacionEnCurso = true;
+    const liberarGuard = () => {
+      citaOperacionEnCurso = false;
+    };
+
     const idSeguimiento = botonCitar.getAttribute("data-id");
 
-    const panelSeguimiento = document.getElementById("new-ITILFollowup-block");
-    if (panelSeguimiento && !panelSeguimiento.classList.contains("show")) {
-      const btnToggle = document.querySelector(
-        '[data-bs-target="#new-ITILFollowup-block"]',
-      );
-      if (btnToggle) {
-        btnToggle.click();
-      } else {
-        panelSeguimiento.classList.add("show");
-      }
-    }
-
-    setTimeout(() => {
+    const insertarCita = () => {
       const formularioRespuesta = document.querySelector(
         "#new-ITILFollowup-block form",
       );
 
-      if (formularioRespuesta) {
-        let inputOculto = document.getElementById("_quoted_followup_id");
-        if (!inputOculto) {
-          inputOculto = document.createElement("input");
-          inputOculto.type = "hidden";
-          inputOculto.id = "_quoted_followup_id";
-          inputOculto.name = "_quoted_followup_id";
-          formularioRespuesta.appendChild(inputOculto);
-        }
-        inputOculto.value = idSeguimiento;
+      if (!formularioRespuesta) {
+        liberarGuard();
+        return;
+      }
 
-        const elementoSeguimiento = document.querySelector(
-          `#ITILFollowup_${idSeguimiento}`,
+      let inputOculto = document.getElementById("_quoted_followup_id");
+      if (!inputOculto) {
+        inputOculto = document.createElement("input");
+        inputOculto.type = "hidden";
+        inputOculto.id = "_quoted_followup_id";
+        inputOculto.name = "_quoted_followup_id";
+        formularioRespuesta.appendChild(inputOculto);
+      }
+      inputOculto.value = idSeguimiento;
+
+      const elementoSeguimiento = document.querySelector(
+        `#ITILFollowup_${idSeguimiento}`,
+      );
+      let textoCitado = "...";
+      let autorCita = t("User");
+
+      if (elementoSeguimiento) {
+        const nodoTexto = elementoSeguimiento.querySelector(
+          ".read-only-content .rich_text_container",
         );
-        let textoCitado = "...";
-        let autorCita = t("user", "User");
+        if (nodoTexto) textoCitado = nodoTexto.innerHTML;
 
-        if (elementoSeguimiento) {
-          const nodoTexto = elementoSeguimiento.querySelector(
-            ".read-only-content .rich_text_container",
-          );
-          if (nodoTexto) textoCitado = nodoTexto.innerHTML;
-
-          const autorNodo = elementoSeguimiento.querySelector(
-            '.creator span[id^="user_"] a, .creator a[href*="user.form.php"]',
-          );
-          if (autorNodo && autorNodo.textContent.trim() !== "") {
-            autorCita = autorNodo.textContent.trim();
-          }
-        }
-
-        // "Quoting %s" — format string kept translatable; %s is the author.
-        const etiquetaCita = t("quoting", "Quoting %s").replace(
-          "%s",
-          autorCita,
+        const autorNodo = elementoSeguimiento.querySelector(
+          '.creator span[id^="user_"] a, .creator a[href*="user.form.php"]',
         );
+        if (autorNodo && autorNodo.textContent.trim() !== "") {
+          autorCita = autorNodo.textContent.trim();
+        }
+      }
 
-        // NOTE: the inline styles below are intentional. This blockquote is
-        // saved as part of the follow-up HTML content and is later rendered
-        // in contexts where the plugin CSS is NOT loaded (mail notifications,
-        // openpdf exports, etc.), so the styling must travel with the content.
-        // The `opencitaseg-quote` class is added on top for timeline styling.
-        const htmlCita = `
+      // "Quoting %s" — format string kept translatable; %s is the author.
+      const etiquetaCita = t("Quoting %s").replace("%s", autorCita);
+
+      // NOTE: the inline styles below are intentional. This blockquote is
+      // saved as part of the follow-up HTML content and is later rendered
+      // in contexts where the plugin CSS is NOT loaded (mail notifications,
+      // openpdf exports, etc.), so the styling must travel with the content.
+      // The `opencitaseg-quote` class is added on top for timeline styling.
+      const htmlCita = `
                     <blockquote contenteditable="false" class="mceNonEditable opencitaseg-quote" style="border-left: 3px solid #0078d4; padding-left: 10px; margin-left: 0; color: #555; background-color: #f8f9fa; padding: 10px; border-radius: 4px; user-select: none;">
                         <strong><a href="#ITILFollowup_${idSeguimiento}" class="opencitaseg-quote-link" style="text-decoration: none; color: #0078d4;">
                             <i class="ti ti-link"></i> ${etiquetaCita}
@@ -170,31 +198,58 @@ document.addEventListener("DOMContentLoaded", function () {
                     <p>&nbsp;</p>
                 `;
 
-        const textarea = formularioRespuesta.querySelector(
-          'textarea[name="content"]',
-        );
+      const textarea = formularioRespuesta.querySelector(
+        'textarea[name="content"]',
+      );
 
-        if (textarea && typeof tinymce !== "undefined") {
-          const editor = tinymce.get(textarea.id);
-
-          if (editor) {
-            document
-              .getElementById("new-itilobject-form")
-              .scrollIntoView({ behavior: "smooth", block: "center" });
-
-            editor.focus();
-
-            editor.selection.select(editor.getBody(), true);
-            editor.selection.collapse(false);
-
-            editor.execCommand("mceInsertContent", false, htmlCita);
-
-            editor.selection.collapse(false);
-          } else {
-            console.error("TinyMCE no reconoció el ID: " + textarea.id);
-          }
-        }
+      if (!textarea || typeof tinymce === "undefined") {
+        liberarGuard();
+        return;
       }
-    }, 150);
+
+      esperarEditor(
+        textarea.id,
+        (editor) => {
+          document
+            .getElementById("new-itilobject-form")
+            .scrollIntoView({ behavior: "smooth", block: "center" });
+
+          editor.focus();
+          editor.selection.select(editor.getBody(), true);
+          editor.selection.collapse(false);
+          editor.execCommand("mceInsertContent", false, htmlCita);
+          editor.selection.collapse(false);
+
+          liberarGuard();
+        },
+        () => {
+          console.error("TinyMCE no reconoció el ID: " + textarea.id);
+          liberarGuard();
+        },
+      );
+    };
+
+    const panelSeguimiento = document.getElementById("new-ITILFollowup-block");
+    if (panelSeguimiento && !panelSeguimiento.classList.contains("show")) {
+      const btnToggle = document.querySelector(
+        '[data-bs-target="#new-ITILFollowup-block"]',
+      );
+
+      if (btnToggle) {
+        // Wait for Bootstrap's own "finished opening" event instead of a
+        // fixed delay — the collapse transition can take longer than any
+        // flat timeout, and interacting with the editor mid-transition is
+        // what caused the "not in standards mode" / getRng race before.
+        panelSeguimiento.addEventListener("shown.bs.collapse", insertarCita, {
+          once: true,
+        });
+        btnToggle.click();
+      } else {
+        panelSeguimiento.classList.add("show");
+        insertarCita();
+      }
+    } else {
+      insertarCita();
+    }
   });
 });

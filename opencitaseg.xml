@@ -2,7 +2,7 @@
    <name>opencitaseg</name>
    <key>opencitaseg</key>
    <state>stable</state>
-   <logo>https://raw.githubusercontent.com/Open-SA/opencitaseg/main/opencitaseg.png</logo>
+   <logo>https://raw.githubusercontent.com/Open-SA/opencitaseg/main/public/opencitaseg.png</logo>
    <description>
       <short>
          <en>opencitaseg GLPI plugin</en>
