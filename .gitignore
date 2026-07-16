@@ -1,6 +1,7 @@
 dist/
 node_modules/
 vendor/
+composer.lock
 .gh_token
 *.min.*
 var

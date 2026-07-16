@@ -10,8 +10,15 @@ parameters:
     scanDirectories:
         - ../../inc
         - ../../src
+
+    # Exclude Cite.php from analysis only (analyse), NOT from scanning.
+    # With the default `excludePaths` (analyseAndScan) the class symbol was
+    # dropped, so hook.php raised "Instantiated class ... Cite not found".
+    # `analyse` keeps the file scanned for symbol resolution while still
+    # skipping error reporting on it.
     excludePaths:
-        - src/Cite.php
+        analyse:
+            - src/Cite.php
 
     bootstrapFiles:
         - ../../vendor/autoload.php

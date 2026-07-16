@@ -1,6 +1,7 @@
 {
   "name": "opensa/opencitaseg",
   "description": "Plugin para GLPI que permite citar seguimientos.",
+  "license": "GPL-2.0-or-later",
   "require": {
     "php": ">=8.2"
   },
@@ -17,10 +18,7 @@
   },
   "autoload": {
     "psr-4": {
-      "GlpiPlugin\\Opencitaseg\\": [
-        "src/",
-        "inc/"
-      ]
+      "GlpiPlugin\\Opencitaseg\\": "src/"
     }
   }
 }
