@@ -32,6 +32,18 @@ namespace GlpiPlugin\Opencitaseg;
 
 use CommonDBTM;
 
+/**
+ * Internal link table mapping a new follow-up (source) to the follow-up it
+ * quotes (target).
+ *
+ * This class is intentionally never exposed through a route, search option or
+ * front/ajax controller. Rows are written only as a side effect of the
+ * `item_add` hook, after GLPI core has already authorised the follow-up
+ * creation and the plugin has verified `canViewItem()` on the quoted target
+ * (see plugin_opencitaseg_item_add() in hook.php). For that reason it defines
+ * no canView()/canCreate() rights on purpose: there is no stateless path from
+ * which an unauthorised write or read could originate.
+ */
 class Cite extends CommonDBTM
 {
     public static function getTable($classname = null)
@@ -41,6 +53,6 @@ class Cite extends CommonDBTM
 
     public static function getTypeName($nb = 0)
     {
-        return _n('Cita de seguimiento', 'Citas de seguimientos', $nb, 'opencitaseg');
+        return _n('Follow-up quote', 'Follow-up quotes', $nb, 'opencitaseg');
     }
 }

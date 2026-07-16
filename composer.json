@@ -2,7 +2,7 @@
   "name": "opensa/opencitaseg",
   "description": "Plugin para GLPI que permite citar seguimientos.",
   "require": {
-    "php": ">=7.4"
+    "php": ">=8.2"
   },
   "require-dev": {
     "glpi-project/tools": "^0.8",
@@ -11,7 +11,7 @@
   "config": {
     "optimize-autoloader": true,
     "platform": {
-      "php": "7.4.0"
+      "php": "8.2.0"
     },
     "sort-packages": true
   },

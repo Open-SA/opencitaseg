@@ -27,6 +27,13 @@
  */
 
 document.addEventListener("DOMContentLoaded", function () {
+  // Translatable UI strings are injected from PHP (see
+  // plugin_opencitaseg_post_init() in hook.php) so they honour the user's
+  // GLPI locale. English fallbacks keep the plugin working if, for any
+  // reason, the block is not present.
+  const I18N = window.OPENCITASEG_I18N || {};
+  const t = (key, fallback) => (I18N[key] != null ? I18N[key] : fallback);
+
   function inyectarBotones() {
     const seguimientos = document.querySelectorAll(
       '.timeline-item[data-itemtype="ITILFollowup"]',
@@ -46,8 +53,8 @@ document.addEventListener("DOMContentLoaded", function () {
         boton.className =
           "btn btn-sm btn-ghost-secondary btn-citar-seguimiento me-2";
         boton.setAttribute("data-id", idSeguimiento);
-        boton.title = "Citar este seguimiento";
-        boton.innerHTML = '<i class="ti ti-quote"></i> Citar';
+        boton.title = t("quote_followup", "Quote this followup");
+        boton.innerHTML = '<i class="ti ti-quote"></i> ' + t("quote", "Quote");
 
         contenedorAcciones.insertBefore(boton, contenedorAcciones.firstChild);
       }
@@ -78,13 +85,11 @@ document.addEventListener("DOMContentLoaded", function () {
         targetElement.scrollIntoView({ behavior: "smooth", block: "center" });
 
         const card = targetElement.querySelector(".card") || targetElement;
-        const colorOriginal = card.style.backgroundColor;
-
-        card.style.transition = "background-color 0.4s ease";
-        card.style.backgroundColor = "#fff3cd";
+        // Transient highlight handled via a CSS class instead of inline styles.
+        card.classList.add("opencitaseg-highlight");
 
         setTimeout(() => {
-          card.style.backgroundColor = colorOriginal;
+          card.classList.remove("opencitaseg-highlight");
         }, 1500);
       }
       return;
@@ -128,7 +133,7 @@ document.addEventListener("DOMContentLoaded", function () {
           `#ITILFollowup_${idSeguimiento}`,
         );
         let textoCitado = "...";
-        let autorCita = "Usuario";
+        let autorCita = t("user", "User");
 
         if (elementoSeguimiento) {
           const nodoTexto = elementoSeguimiento.querySelector(
@@ -143,10 +148,22 @@ document.addEventListener("DOMContentLoaded", function () {
             autorCita = autorNodo.textContent.trim();
           }
         }
+
+        // "Quoting %s" — format string kept translatable; %s is the author.
+        const etiquetaCita = t("quoting", "Quoting %s").replace(
+          "%s",
+          autorCita,
+        );
+
+        // NOTE: the inline styles below are intentional. This blockquote is
+        // saved as part of the follow-up HTML content and is later rendered
+        // in contexts where the plugin CSS is NOT loaded (mail notifications,
+        // openpdf exports, etc.), so the styling must travel with the content.
+        // The `opencitaseg-quote` class is added on top for timeline styling.
         const htmlCita = `
-                    <blockquote contenteditable="false" class="mceNonEditable" style="border-left: 3px solid #0078d4; padding-left: 10px; margin-left: 0; color: #555; background-color: #f8f9fa; padding: 10px; border-radius: 4px; user-select: none;">
-                        <strong><a href="#ITILFollowup_${idSeguimiento}" style="text-decoration: none; color: #0078d4;">
-                            <i class="ti ti-link"></i> Citando a ${autorCita}
+                    <blockquote contenteditable="false" class="mceNonEditable opencitaseg-quote" style="border-left: 3px solid #0078d4; padding-left: 10px; margin-left: 0; color: #555; background-color: #f8f9fa; padding: 10px; border-radius: 4px; user-select: none;">
+                        <strong><a href="#ITILFollowup_${idSeguimiento}" class="opencitaseg-quote-link" style="text-decoration: none; color: #0078d4;">
+                            <i class="ti ti-link"></i> ${etiquetaCita}
                         </a>:</strong><br>
                         ${textoCitado}
                     </blockquote>

@@ -28,7 +28,7 @@
  * -------------------------------------------------------------------------
  */
 
-define('PLUGIN_OPENCITASEG_VERSION', '1.0.1');
+define('PLUGIN_OPENCITASEG_VERSION', '1.1.0');
 
 // Minimal GLPI version, inclusive
 define("PLUGIN_OPENCITASEG_MIN_GLPI_VERSION", "11.0.0");
@@ -51,6 +51,10 @@ function plugin_init_opencitaseg(): void
     ];
 
     $PLUGIN_HOOKS['add_javascript']['opencitaseg'] = ['js/citas.js'];
+    $PLUGIN_HOOKS['add_css']['opencitaseg']        = ['css/citas.css'];
+
+    // Expose translatable UI strings to citas.js.
+    $PLUGIN_HOOKS['post_init']['opencitaseg'] = 'plugin_opencitaseg_post_init';
 }
 
 /**

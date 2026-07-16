@@ -22,14 +22,17 @@
    </authors>
    <versions>
       <version>
-         <num>1.0.1</num>
+         <num>1.1.0</num>
          <compatibility>~11.0.0</compatibility>
-         <download_url>https://github.com/Open-SA/opencitaseg/releases/download/v1.0.1/opencitaseg-1.0.1.tar.gz</download_url>
+         <download_url>https://github.com/Open-SA/opencitaseg/releases/download/v1.1.0/opencitaseg-1.1.0.tar.gz</download_url>
       </version>
    </versions>
    <langs>
       <lang>en_GB</lang>
+      <lang>es_AR</lang>
       <lang>es_ES</lang>
+      <lang>fr_FR</lang>
+      <lang>pt_BR</lang>
    </langs>
    <license>GPL v2+</license>
    <tags>

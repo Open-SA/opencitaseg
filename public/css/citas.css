@@ -1,0 +1,36 @@
+/*
+ * -------------------------------------------------------------------------
+ * opencitaseg plugin for GLPI
+ * -------------------------------------------------------------------------
+ * @copyright Copyright (C) 2013-2026 by opencitaseg plugin team.
+ * @license   GPLv2 https://www.gnu.org/licenses/gpl-2.0.html
+ * @link      https://github.com/Open-SA/opencitaseg
+ * -------------------------------------------------------------------------
+ */
+
+/* Transient highlight applied when navigating to a quoted follow-up. */
+.opencitaseg-highlight {
+  transition: background-color 0.4s ease;
+  background-color: #fff3cd !important;
+}
+
+/*
+ * Timeline styling for the quote block. The inserted blockquote also carries
+ * inline styles (see citas.js) so it renders correctly outside the timeline —
+ * mail notifications, PDF exports — where this stylesheet is not loaded. These
+ * rules simply keep the class self-describing for in-app display.
+ */
+.opencitaseg-quote {
+  border-left: 3px solid #0078d4;
+  padding: 10px;
+  margin-left: 0;
+  color: #555;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  user-select: none;
+}
+
+.opencitaseg-quote-link {
+  text-decoration: none;
+  color: #0078d4;
+}
