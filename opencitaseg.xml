@@ -7,10 +7,12 @@
       <short>
          <en>opencitaseg GLPI plugin</en>
          <es>Plugin de citas para seguimientos de GLPI</es>
+         <ja>GLPI フォロー引用プラグイン</ja>
       </short>
       <long>
          <en>Allows quoting ITIL follow-ups in GLPI tickets.</en>
          <es>Permite citar seguimientos ITIL en los tickets de GLPI.</es>
+         <ja>GLPI チケットにおいて、ITIL フォローアップの引用を可能にします。</ja>
       </long>
    </description>
    <homepage>https://github.com/Open-SA/opencitaseg</homepage>
@@ -33,6 +35,7 @@
       <lang>es_ES</lang>
       <lang>fr_FR</lang>
       <lang>pt_BR</lang>
+      <lang>ja_JP</lang>
    </langs>
    <license>GPL v2+</license>
    <tags>
@@ -46,5 +49,10 @@
          <tag>seguimiento</tag>
          <tag>itil</tag>
       </es>
+      <ja>
+         <tag>引用</tag>
+         <tag>フォロー</tag>
+         <tag>ITIL</tag>
+      </ja>
    </tags>
 </root>
