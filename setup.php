@@ -28,7 +28,7 @@
  * -------------------------------------------------------------------------
  */
 
-define('PLUGIN_OPENCITASEG_VERSION', '1.1.2');
+define('PLUGIN_OPENCITASEG_VERSION', '1.1.3');
 
 // Minimal GLPI version, inclusive
 define("PLUGIN_OPENCITASEG_MIN_GLPI_VERSION", "11.0.0");
@@ -50,8 +50,22 @@ function plugin_init_opencitaseg(): void
         'ITILFollowup' => 'plugin_opencitaseg_item_add',
     ];
 
-    $PLUGIN_HOOKS['add_javascript']['opencitaseg'] = ['js/citas.js'];
-    $PLUGIN_HOOKS['add_css']['opencitaseg']        = ['css/citas.css'];
+    // El catalogo gettext del plugin se carga solo del lado PHP: GLPI no
+    // expone los dominios de plugin al objeto `i18n` del front. Por eso las
+    // cadenas que usa citas.js se sirven como un diccionario JS por idioma,
+    // generado desde los .po con tools/build-js-locales.py. Se registra
+    // ANTES de citas.js para que ya este disponible en el DOMContentLoaded.
+    $lang    = $_SESSION['glpilanguage'] ?? 'en_GB';
+    $basedir = Plugin::getPhpDir('opencitaseg') . '/public/js/locales/';
+    if (! preg_match('/^[a-z]{2}_[A-Z]{2}$/', $lang) || ! file_exists($basedir . $lang . '.js')) {
+        $lang = 'en_GB';
+    }
+
+    $PLUGIN_HOOKS['add_javascript']['opencitaseg'] = [
+        'js/locales/' . $lang . '.js',
+        'js/citas.js',
+    ];
+    $PLUGIN_HOOKS['add_css']['opencitaseg'] = ['css/citas.css'];
 }
 
 /**

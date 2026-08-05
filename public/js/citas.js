@@ -32,9 +32,11 @@ document.addEventListener("DOMContentLoaded", function () {
   // FrontEndAssetsExtension::localesJs()), so `__(msgid, 'opencitaseg')`
   // resolves against this plugin's `.mo` files and honours the user's
   // locale. If `__` is somehow unavailable, fall back to the msgid itself.
-  const DOMAIN = "opencitaseg";
-  const t = (msgid) =>
-    typeof window.__ === "function" ? window.__(msgid, DOMAIN) : msgid;
+  // Diccionario inyectado por setup.php (public/js/locales/<lang>.js).
+  // GLPI carga los .mo de plugins solo del lado PHP, asi que window.__()
+  // con un dominio de plugin devuelve el msgid sin traducir. Fallback al
+  // msgid si el archivo de locale no llego a cargarse.
+  const t = (msgid) => (window.OPENCITASEG_I18N || {})[msgid] || msgid;
 
   function inyectarBotones() {
     const seguimientos = document.querySelectorAll(
@@ -80,8 +82,14 @@ document.addEventListener("DOMContentLoaded", function () {
   // (e.g. right after Bootstrap starts opening the reply panel) can hit the
   // editor mid-initialization and throw, so this replaces a flat delay with
   // an actual readiness check.
-  function esperarEditor(textareaId, onReady, onTimeout, intentosRestantes = 30) {
-    const editor = typeof tinymce !== "undefined" ? tinymce.get(textareaId) : null;
+  function esperarEditor(
+    textareaId,
+    onReady,
+    onTimeout,
+    intentosRestantes = 30,
+  ) {
+    const editor =
+      typeof tinymce !== "undefined" ? tinymce.get(textareaId) : null;
 
     if (editor && editor.initialized) {
       onReady(editor);
@@ -94,7 +102,8 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     setTimeout(
-      () => esperarEditor(textareaId, onReady, onTimeout, intentosRestantes - 1),
+      () =>
+        esperarEditor(textareaId, onReady, onTimeout, intentosRestantes - 1),
       100,
     );
   }

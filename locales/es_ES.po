@@ -1,7 +1,11 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: opencitaseg 1.0.2\n"
+<<<<<<< HEAD
+"Project-Id-Version: opencitaseg 1.1.3\n"
+=======
+"Project-Id-Version: opencitaseg 1.1.3\n"
+>>>>>>> 9fea86d (cambio v)
 "Report-Msgid-Bugs-To: https://github.com/Open-SA/opencitaseg/issues\n"
 "Last-Translator: OpenSA\n"
 "Language-Team: es_ES\n"
