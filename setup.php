@@ -28,6 +28,10 @@
  * -------------------------------------------------------------------------
  */
 
+use GlpiPlugin\Opencitaseg\CiteNotification;
+
+// El bump a 1.2.0 va en su propia rama chore/release-1.2.0 (guia §7),
+// no en la rama feat/notificaciones-cita.
 define('PLUGIN_OPENCITASEG_VERSION', '1.1.3');
 
 // Minimal GLPI version, inclusive
@@ -49,6 +53,22 @@ function plugin_init_opencitaseg(): void
     $PLUGIN_HOOKS['item_add']['opencitaseg'] = [
         'ITILFollowup' => 'plugin_opencitaseg_item_add',
     ];
+
+    // Notificación "te citaron en un seguimiento".
+    //
+    // Plugin::doHook() enruta los hooks de item por get_class($param), y el
+    // parámetro que recibe un hook de notificación es el NotificationTarget:
+    // la clave es 'NotificationTargetTicket', NO 'Ticket'.
+    foreach (CiteNotification::getTargetClasses() as $targetClass) {
+        $PLUGIN_HOOKS['item_get_events']['opencitaseg'][$targetClass]
+        = [CiteNotification::class, 'addEvents'];
+        $PLUGIN_HOOKS['item_add_targets']['opencitaseg'][$targetClass]
+        = [CiteNotification::class, 'addTargets'];
+        $PLUGIN_HOOKS['item_action_targets']['opencitaseg'][$targetClass]
+        = [CiteNotification::class, 'actionTargets'];
+        $PLUGIN_HOOKS['item_get_datas']['opencitaseg'][$targetClass]
+        = [CiteNotification::class, 'addData'];
+    }
 
     // El catalogo gettext del plugin se carga solo del lado PHP: GLPI no
     // expone los dominios de plugin al objeto `i18n` del front. Por eso las

@@ -28,6 +28,9 @@
  * -------------------------------------------------------------------------
  */
 
+use GlpiPlugin\Opencitaseg\Cite;
+use GlpiPlugin\Opencitaseg\CiteNotification;
+
 function plugin_opencitaseg_install()
 {
     global $DB;
@@ -47,12 +50,14 @@ function plugin_opencitaseg_install()
         $DB->doQueryOrDie($query, $DB->error());
     }
 
-    return true;
+    return CiteNotification::install();
 }
 
 function plugin_opencitaseg_uninstall()
 {
     global $DB;
+
+    CiteNotification::uninstall();
 
     $table = 'glpi_plugin_opencitaseg_cites';
     if ($DB->tableExists($table)) {
@@ -64,6 +69,10 @@ function plugin_opencitaseg_uninstall()
 
 function plugin_opencitaseg_item_add($item)
 {
+    if (! $item instanceof ITILFollowup) {
+        return;
+    }
+
     if (! isset($_POST['_quoted_followup_id']) || empty($_POST['_quoted_followup_id'])) {
         return;
     }
@@ -86,9 +95,15 @@ function plugin_opencitaseg_item_add($item)
         return;
     }
 
-    $cite = new \GlpiPlugin\Opencitaseg\Cite();
+    $cite = new Cite();
     $cite->add([
         'itilfollowups_id_source' => $item->fields['id'],
         'itilfollowups_id_target' => $targetId,
     ]);
+
+    // La notificación se levanta después de persistir la relación y después de
+    // que canViewItem() confirmó que quien cita tenía derecho a ver el
+    // seguimiento citado. CiteNotification aplica sus propios filtros
+    // (seguimiento privado, autocita, autor inexistente).
+    CiteNotification::raiseForCite($item, $targetFollowup);
 }
