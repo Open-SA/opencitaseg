@@ -1,11 +1,7 @@
 #
 msgid ""
 msgstr ""
-<<<<<<< HEAD
 "Project-Id-Version: opencitaseg 1.1.3\n"
-=======
-"Project-Id-Version: opencitaseg 1.1.3\n"
->>>>>>> 9fea86d (cambio v)
 "Report-Msgid-Bugs-To: https://github.com/Open-SA/opencitaseg/issues\n"
 "Last-Translator: OpenSA\n"
 "Language-Team: fr_FR\n"
@@ -37,3 +33,19 @@ msgid "Follow-up quote"
 msgid_plural "Follow-up quotes"
 msgstr[0] "Citation de suivi"
 msgstr[1] "Citations de suivi"
+
+
+msgid "Follow-up quoted"
+msgstr "Suivi cité"
+
+msgid "Author of the quoted follow-up"
+msgstr "Auteur du suivi cité"
+
+msgid "User who quoted the follow-up"
+msgstr "Utilisateur ayant cité le suivi"
+
+msgid "Date of the quote"
+msgstr "Date de la citation"
+
+msgid "Unknown user"
+msgstr "Utilisateur inconnu"

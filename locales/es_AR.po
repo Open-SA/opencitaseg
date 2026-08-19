@@ -33,3 +33,18 @@ msgid "Follow-up quote"
 msgid_plural "Follow-up quotes"
 msgstr[0] "Cita de seguimiento"
 msgstr[1] "Citas de seguimiento"
+
+msgid "Follow-up quoted"
+msgstr "Seguimiento citado"
+
+msgid "Author of the quoted follow-up"
+msgstr "Autor del seguimiento citado"
+
+msgid "User who quoted the follow-up"
+msgstr "Usuario que citó el seguimiento"
+
+msgid "Date of the quote"
+msgstr "Fecha de la cita"
+
+msgid "Unknown user"
+msgstr "Usuario desconocido"
