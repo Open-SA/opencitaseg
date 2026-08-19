@@ -39,6 +39,19 @@ git clone [https://github.com/Open-SA/opencitaseg.git](https://github.com/Open-S
 
 The quote button is injected purely on the frontend. Server-side, the plugin natively respects GLPI's visibility rules. A user can only quote a followup if they have the necessary rights to view it (`canViewItem()`) and the right to add a new followup to the ticket.
 
+## Notifications
+
+When a follow-up is quoted, the author of the quoted follow-up is notified.
+
+* The notification is registered on install for Tickets, Changes and Problems, under the event
+  **Follow-up quoted**, and can be edited or disabled in **Setup > Notifications**.
+* Both delivery modes are registered: e-mail and browser notification.
+* The body never contains the text of any follow-up — only who quoted, when, the object title and its URL.
+* **Private follow-ups do not trigger a notification.** GLPI evaluates the "see private follow-ups" right
+  against the active session, so the plugin cannot verify it on behalf of the recipient and fails closed.
+* No notification is sent when a user quotes their own follow-up, or when the quoted follow-up has no
+  author (e.g. created by the mail collector).
+
 ## File Structure
 
 ```text
