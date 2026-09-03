@@ -142,3 +142,38 @@ function plugin_opencitaseg_item_add($item)
     // (seguimiento privado, autocita, autor inexistente).
     CiteNotification::raiseForCite($item, $targetFollowup);
 }
+
+/**
+ * Fuerza la privacidad de la cita cuando el seguimiento citado es privado.
+ *
+ * Corre en pre_item_add porque necesita pisar el input antes de que GLPI
+ * escriba la fila. El checkbox que marca el JS es solo UX: este es el control
+ * real, y es el que impide que alguien publique contenido privado mandando
+ * el POST a mano.
+ */
+function plugin_opencitaseg_pre_item_add($item)
+{
+    if (empty($item->input['_quoted_followup_id'])) {
+        return $item;
+    }
+
+    $target = new ITILFollowup();
+    if (! $target->getFromDB((int) $item->input['_quoted_followup_id'])) {
+        return $item;
+    }
+
+    // El citado tiene que pertenecer al mismo objeto ITIL, igual que en
+    // plugin_opencitaseg_item_add().
+    if (
+        $target->fields['itemtype'] !== ($item->input['itemtype'] ?? null)
+        || (int) $target->fields['items_id'] !== (int) ($item->input['items_id'] ?? 0)
+    ) {
+        return $item;
+    }
+
+    if ((int) $target->fields['is_private'] === 1) {
+        $item->input['is_private'] = 1;
+    }
+
+    return $item;
+}

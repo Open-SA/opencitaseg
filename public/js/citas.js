@@ -42,6 +42,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // endpoint conteste, asi evitamos el parpadeo de un boton que despues
   // habria que sacar.
   let citasHabilitadas = null;
+  let citaPrivadaPorDefecto = false;
 
   function contextoItil() {
     const form = document.querySelector("#new-ITILFollowup-block form");
@@ -107,6 +108,7 @@ document.addEventListener("DOMContentLoaded", function () {
       .then((r) => (r.ok ? r.json() : { active: false }))
       .then((data) => {
         citasHabilitadas = data.active === true;
+        citaPrivadaPorDefecto = data.default_private === true;
         inyectarBotones();
       })
       .catch(() => {
@@ -215,6 +217,8 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
       }
 
+      aplicarPrivacidadPorDefecto(formularioRespuesta);
+
       let inputOculto = document.getElementById("_quoted_followup_id");
       if (!inputOculto) {
         inputOculto = document.createElement("input");
@@ -317,4 +321,24 @@ document.addEventListener("DOMContentLoaded", function () {
       insertarCita();
     }
   });
+
+  function aplicarPrivacidadPorDefecto(form) {
+    if (!citaPrivadaPorDefecto) return;
+
+    const checkbox = form.querySelector(
+      'input[type="checkbox"][name="is_private"]',
+    );
+
+    if (checkbox) {
+      if (!checkbox.checked) {
+        checkbox.checked = true;
+        checkbox.dispatchEvent(new Event("change", { bubbles: true }));
+      }
+      return;
+    }
+
+    const hidden = form.querySelector('input[type="hidden"][name="is_private"]');
+    if (hidden) hidden.value = "1";
+  }
+
 });

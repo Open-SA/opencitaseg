@@ -49,30 +49,29 @@ class Config extends CommonDBTM
         return true;
     }
 
-    /**
-     * Resuelve si las citas estan activas para una entidad, subiendo por la
-     * cadena de padres mientras la entidad herede o no tenga fila propia.
-     *
-     * Fail-open: sin ninguna fila en toda la cadena, las citas quedan activas,
-     * para no alterar el comportamiento de instalaciones previas.
+        /**
+     * @return array{is_active: bool, default_private: bool}
      */
-    public static function isActiveForEntity(int $entities_id): bool
+    public static function resolveForEntity(int $entities_id): array
     {
         if (isset(self::$resolved[$entities_id])) {
             return self::$resolved[$entities_id];
         }
 
-        $result  = true;
+        // Fail-open: sin ninguna fila en la cadena, las citas quedan activas
+        // y publicas, que es el comportamiento previo a este plugin.
+        $result  = ['is_active' => true, 'default_private' => false];
         $current = $entities_id;
 
-        // Guard de profundidad: un arbol de entidades corrupto no debe colgar
-        // el request.
         for ($depth = 0; $depth < 50; $depth++) {
             $config = new self();
 
             if ($config->getFromDBByCrit(['entities_id' => $current])) {
                 if ($current === 0 || ! (int) $config->fields['use_parent_config']) {
-                    $result = (bool) $config->fields['is_active'];
+                    $result = [
+                        'is_active'       => (bool) $config->fields['is_active'],
+                        'default_private' => (bool) $config->fields['default_private'],
+                    ];
                     break;
                 }
             }
@@ -95,22 +94,33 @@ class Config extends CommonDBTM
     }
 
     /**
-     * Igual que isActiveForEntity() pero partiendo del objeto ITIL. Incluye
-     * el chequeo de lectura para que el endpoint AJAX no revele la existencia
-     * de tickets que el usuario no puede ver.
+     * @return array{is_active: bool, default_private: bool}|null null si el
+     *         usuario no puede leer el objeto ITIL.
      */
-    public static function isActiveForItem(string $itemtype, int $items_id): bool
+    public static function resolveForItem(string $itemtype, int $items_id): ?array
     {
         if (! is_a($itemtype, CommonITILObject::class, true)) {
-            return false;
+            return null;
         }
 
         $item = new $itemtype();
         if (! $item->getFromDB($items_id) || ! $item->can($items_id, READ)) {
-            return false;
+            return null;
         }
 
-        return self::isActiveForEntity((int) $item->fields['entities_id']);
+        return self::resolveForEntity((int) $item->fields['entities_id']);
+    }
+
+    public static function isActiveForEntity(int $entities_id): bool
+    {
+        return self::resolveForEntity($entities_id)['is_active'];
+    }
+
+    public static function isActiveForItem(string $itemtype, int $items_id): bool
+    {
+        $resolved = self::resolveForItem($itemtype, $items_id);
+
+        return $resolved !== null && $resolved['is_active'];
     }
 
     public static function saveForEntity(int $entities_id, array $input): bool
