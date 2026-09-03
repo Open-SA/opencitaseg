@@ -38,7 +38,24 @@ document.addEventListener("DOMContentLoaded", function () {
   // msgid si el archivo de locale no llego a cargarse.
   const t = (msgid) => (window.OPENCITASEG_I18N || {})[msgid] || msgid;
 
+    // null = todavia no resuelto. Los botones no se dibujan hasta que el
+  // endpoint conteste, asi evitamos el parpadeo de un boton que despues
+  // habria que sacar.
+  let citasHabilitadas = null;
+
+  function contextoItil() {
+    const form = document.querySelector("#new-ITILFollowup-block form");
+    if (!form) return null;
+
+    const itemtype = form.querySelector('input[name="itemtype"]')?.value;
+    const itemsId = form.querySelector('input[name="items_id"]')?.value;
+
+    if (!itemtype || !itemsId) return null;
+    return { itemtype, itemsId };
+  }
+
   function inyectarBotones() {
+    if (citasHabilitadas !== true) return;
     const seguimientos = document.querySelectorAll(
       '.timeline-item[data-itemtype="ITILFollowup"]',
     );
@@ -65,14 +82,52 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  inyectarBotones();
+      let resolucionEnCurso = false;
+
+  // La timeline puede renderizarse despues del DOMContentLoaded, asi que la
+  // resolucion se intenta tambien desde el MutationObserver. Se ejecuta una
+  // sola vez: el guard corta tanto si ya hay resultado como si hay un fetch
+  // en vuelo.
+  function resolverHabilitacion() {
+    if (citasHabilitadas !== null || resolucionEnCurso) return;
+
+    const contexto = contextoItil();
+    if (!contexto) return;
+
+    resolucionEnCurso = true;
+
+    fetch(
+      (window.CFG_GLPI?.root_doc ?? "") +
+        "/plugins/opencitaseg/ajax/isactive.php?itemtype=" +
+        encodeURIComponent(contexto.itemtype) +
+        "&items_id=" +
+        encodeURIComponent(contexto.itemsId),
+      { credentials: "same-origin" },
+    )
+      .then((r) => (r.ok ? r.json() : { active: false }))
+      .then((data) => {
+        citasHabilitadas = data.active === true;
+        inyectarBotones();
+      })
+      .catch(() => {
+        // Fail-open, igual que la resolucion en PHP. El gate real esta en
+        // hook.php; esto es solo UX.
+        citasHabilitadas = true;
+        inyectarBotones();
+      });
+  }
+
+  resolverHabilitacion();
 
   const observer = new MutationObserver(function (mutations) {
     let deberiamosInyectar = false;
     mutations.forEach(function (mutation) {
       if (mutation.addedNodes.length > 0) deberiamosInyectar = true;
     });
-    if (deberiamosInyectar) inyectarBotones();
+    if (deberiamosInyectar) {
+      resolverHabilitacion();
+      inyectarBotones();
+    }
   });
 
   observer.observe(document.body, { childList: true, subtree: true });
@@ -133,6 +188,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     const botonCitar = e.target.closest(".btn-citar-seguimiento");
+    if (citasHabilitadas !== true) return;
     if (!botonCitar) return;
 
     e.preventDefault();

@@ -54,6 +54,10 @@ function plugin_init_opencitaseg(): void
         'ITILFollowup' => 'plugin_opencitaseg_item_add',
     ];
 
+    Plugin::registerClass(\GlpiPlugin\Opencitaseg\Config::class, [
+    'addtabon' => ['Entity'],
+    ]);
+
     // Notificación "te citaron en un seguimiento".
     //
     // Plugin::doHook() enruta los hooks de item por get_class($param), y el

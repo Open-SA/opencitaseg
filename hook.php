@@ -50,22 +50,48 @@ function plugin_opencitaseg_install()
         $DB->doQueryOrDie($query, $DB->error());
     }
 
-    return CiteNotification::install();
+    $configTable = 'glpi_plugin_opencitaseg_configs';
+
+    if (! $DB->tableExists($configTable)) {
+        $query = "CREATE TABLE `$configTable` (
+            `id` int unsigned NOT NULL AUTO_INCREMENT,
+            `entities_id` int unsigned NOT NULL DEFAULT 0,
+            `use_parent_config` tinyint NOT NULL DEFAULT 1 COMMENT 'Hereda de la entidad padre',
+            `is_active` tinyint NOT NULL DEFAULT 1 COMMENT 'Citas habilitadas en la entidad',
+            `default_private` tinyint NOT NULL DEFAULT 0 COMMENT 'Valor inicial de is_private en la cita',
+            PRIMARY KEY (`id`),
+            UNIQUE KEY `entities_id` (`entities_id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+
+        $DB->doQueryOrDie($query, $DB->error());
+    }
+
+    // La entidad raiz no puede heredar: siempre define su propio valor.
+    // Se siembra activa para no cambiar el comportamiento de instalaciones
+    // que vienen de una version anterior sin configuracion.
+    $DB->doQueryOrDie(
+        "INSERT IGNORE INTO `$configTable`
+            (`entities_id`, `use_parent_config`, `is_active`, `default_private`)
+         VALUES (0, 0, 1, 0)",
+        $DB->error()
+    );
+
+    return true;
 }
 
 function plugin_opencitaseg_uninstall()
 {
     global $DB;
 
-    CiteNotification::uninstall();
-
-    $table = 'glpi_plugin_opencitaseg_cites';
-    if ($DB->tableExists($table)) {
-        $DB->doQueryOrDie("DROP TABLE `$table`", $DB->error());
+    foreach (['glpi_plugin_opencitaseg_cites', 'glpi_plugin_opencitaseg_configs'] as $table) {
+        if ($DB->tableExists($table)) {
+            $DB->doQueryOrDie("DROP TABLE `$table`", $DB->error());
+        }
     }
 
     return true;
 }
+
 
 function plugin_opencitaseg_item_add($item)
 {
@@ -92,6 +118,15 @@ function plugin_opencitaseg_item_add($item)
     }
 
     if (! $targetFollowup->canViewItem()) {
+        return;
+    }
+
+    if (
+        ! \GlpiPlugin\Opencitaseg\Config::isActiveForItem(
+            (string) $item->fields['itemtype'],
+            (int) $item->fields['items_id']
+        )
+    ) {
         return;
     }
 
