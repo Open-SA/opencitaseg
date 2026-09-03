@@ -16,4 +16,9 @@ if ($items_id <= 0 || ! in_array($itemtype, ['Ticket', 'Change', 'Problem'], tru
     exit;
 }
 
-echo json_encode(['active' => Config::isActiveForItem($itemtype, $items_id)]);
+$resolved = Config::resolveForItem($itemtype, $items_id);
+
+echo json_encode([
+    'active'          => $resolved !== null && $resolved['is_active'],
+    'default_private' => $resolved !== null && $resolved['default_private'],
+]);

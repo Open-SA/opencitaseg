@@ -32,7 +32,7 @@ use GlpiPlugin\Opencitaseg\CiteNotification;
 
 // El bump a 1.2.0 va en su propia rama chore/release-1.2.0 (guia §7),
 // no en la rama feat/notificaciones-cita.
-define('PLUGIN_OPENCITASEG_VERSION', '1.2.0');
+define('PLUGIN_OPENCITASEG_VERSION', '1.2.2');
 
 // Minimal GLPI version, inclusive
 define("PLUGIN_OPENCITASEG_MIN_GLPI_VERSION", "11.0.0");
@@ -52,6 +52,10 @@ function plugin_init_opencitaseg(): void
 
     $PLUGIN_HOOKS['item_add']['opencitaseg'] = [
         'ITILFollowup' => 'plugin_opencitaseg_item_add',
+    ];
+
+    $PLUGIN_HOOKS['pre_item_add']['opencitaseg'] = [
+        'ITILFollowup' => 'plugin_opencitaseg_pre_item_add',
     ];
 
     Plugin::registerClass(\GlpiPlugin\Opencitaseg\Config::class, [
