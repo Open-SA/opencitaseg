@@ -55,6 +55,45 @@ document.addEventListener("DOMContentLoaded", function () {
     return { itemtype, itemsId };
   }
 
+  // Citas de versiones anteriores del plugin, que no llevaban la clase
+  // opencitaseg-quote. Se reconocen por el borde izquierdo del estilo inline,
+  // que se mantuvo igual en todas las generaciones del markup.
+  function esCitaDelPlugin(blockquote) {
+    if (blockquote.classList.contains("opencitaseg-quote")) return true;
+
+    const estilo = (blockquote.getAttribute("style") || "")
+      .replace(/\s+/g, " ")
+      .toLowerCase();
+
+    return (
+      estilo.includes("3px solid #0078d4") ||
+      estilo.includes("3px solid rgb(0, 120, 212)")
+    );
+  }
+
+    // Poda las citas que el seguimiento citado ya tenia adentro. Sin esto, citar
+  // una respuesta que a su vez citaba a otra arrastra las dos, y el contenido
+  // crece en cada vuelta del intercambio.
+  //
+  // Devuelve null cuando el seguimiento citado no tenia texto propio (era solo
+  // una cita), para que el llamador use el placeholder en vez de un bloque
+  // vacio.
+  function podarCitasAnidadas(html) {
+    // DOMParser produce un documento inerte: no ejecuta scripts ni dispara la
+    // carga de recursos, a diferencia de asignar innerHTML en un div suelto.
+    const doc = new DOMParser().parseFromString(html, "text/html");
+
+    doc.body.querySelectorAll("blockquote").forEach((cita) => {
+      if (esCitaDelPlugin(cita)) cita.remove();
+    });
+
+    if (doc.body.textContent.trim() === "" && !doc.body.querySelector("img")) {
+      return null;
+    }
+
+    return doc.body.innerHTML;
+  }
+
   function inyectarBotones() {
     if (citasHabilitadas !== true) return;
     const seguimientos = document.querySelectorAll(
@@ -239,7 +278,9 @@ document.addEventListener("DOMContentLoaded", function () {
         const nodoTexto = elementoSeguimiento.querySelector(
           ".read-only-content .rich_text_container",
         );
-        if (nodoTexto) textoCitado = nodoTexto.innerHTML;
+        if (nodoTexto) {
+          textoCitado = podarCitasAnidadas(nodoTexto.innerHTML) ?? "...";
+        }
 
         const autorNodo = elementoSeguimiento.querySelector(
           '.creator span[id^="user_"] a, .creator a[href*="user.form.php"]',
