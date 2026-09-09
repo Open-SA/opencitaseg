@@ -355,8 +355,10 @@ document.addEventListener("DOMContentLoaded", function () {
         });
         btnToggle.click();
       } else {
-        panelSeguimiento.classList.add("show");
-        insertarCita();
+        // Sin boton de responder, GLPI decidio no ofrecer el formulario.
+        // No forzamos el collapse: seria pasar por encima de esa decision.
+        liberarGuard();
+        return;
       }
     } else {
       insertarCita();
