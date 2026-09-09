@@ -38,7 +38,64 @@ document.addEventListener("DOMContentLoaded", function () {
   // msgid si el archivo de locale no llego a cargarse.
   const t = (msgid) => (window.OPENCITASEG_I18N || {})[msgid] || msgid;
 
+    // null = todavia no resuelto. Los botones no se dibujan hasta que el
+  // endpoint conteste, asi evitamos el parpadeo de un boton que despues
+  // habria que sacar.
+  let citasHabilitadas = null;
+  let citaPrivadaPorDefecto = false;
+
+  function contextoItil() {
+    const form = document.querySelector("#new-ITILFollowup-block form");
+    if (!form) return null;
+
+    const itemtype = form.querySelector('input[name="itemtype"]')?.value;
+    const itemsId = form.querySelector('input[name="items_id"]')?.value;
+
+    if (!itemtype || !itemsId) return null;
+    return { itemtype, itemsId };
+  }
+
+  // Citas de versiones anteriores del plugin, que no llevaban la clase
+  // opencitaseg-quote. Se reconocen por el borde izquierdo del estilo inline,
+  // que se mantuvo igual en todas las generaciones del markup.
+  function esCitaDelPlugin(blockquote) {
+    if (blockquote.classList.contains("opencitaseg-quote")) return true;
+
+    const estilo = (blockquote.getAttribute("style") || "")
+      .replace(/\s+/g, " ")
+      .toLowerCase();
+
+    return (
+      estilo.includes("3px solid #0078d4") ||
+      estilo.includes("3px solid rgb(0, 120, 212)")
+    );
+  }
+
+    // Poda las citas que el seguimiento citado ya tenia adentro. Sin esto, citar
+  // una respuesta que a su vez citaba a otra arrastra las dos, y el contenido
+  // crece en cada vuelta del intercambio.
+  //
+  // Devuelve null cuando el seguimiento citado no tenia texto propio (era solo
+  // una cita), para que el llamador use el placeholder en vez de un bloque
+  // vacio.
+  function podarCitasAnidadas(html) {
+    // DOMParser produce un documento inerte: no ejecuta scripts ni dispara la
+    // carga de recursos, a diferencia de asignar innerHTML en un div suelto.
+    const doc = new DOMParser().parseFromString(html, "text/html");
+
+    doc.body.querySelectorAll("blockquote").forEach((cita) => {
+      if (esCitaDelPlugin(cita)) cita.remove();
+    });
+
+    if (doc.body.textContent.trim() === "" && !doc.body.querySelector("img")) {
+      return null;
+    }
+
+    return doc.body.innerHTML;
+  }
+
   function inyectarBotones() {
+    if (citasHabilitadas !== true) return;
     const seguimientos = document.querySelectorAll(
       '.timeline-item[data-itemtype="ITILFollowup"]',
     );
@@ -65,14 +122,53 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  inyectarBotones();
+      let resolucionEnCurso = false;
+
+  // La timeline puede renderizarse despues del DOMContentLoaded, asi que la
+  // resolucion se intenta tambien desde el MutationObserver. Se ejecuta una
+  // sola vez: el guard corta tanto si ya hay resultado como si hay un fetch
+  // en vuelo.
+  function resolverHabilitacion() {
+    if (citasHabilitadas !== null || resolucionEnCurso) return;
+
+    const contexto = contextoItil();
+    if (!contexto) return;
+
+    resolucionEnCurso = true;
+
+    fetch(
+      (window.CFG_GLPI?.root_doc ?? "") +
+        "/plugins/opencitaseg/ajax/isactive.php?itemtype=" +
+        encodeURIComponent(contexto.itemtype) +
+        "&items_id=" +
+        encodeURIComponent(contexto.itemsId),
+      { credentials: "same-origin" },
+    )
+      .then((r) => (r.ok ? r.json() : { active: false }))
+      .then((data) => {
+        citasHabilitadas = data.active === true;
+        citaPrivadaPorDefecto = data.default_private === true;
+        inyectarBotones();
+      })
+      .catch(() => {
+        // Fail-open, igual que la resolucion en PHP. El gate real esta en
+        // hook.php; esto es solo UX.
+        citasHabilitadas = true;
+        inyectarBotones();
+      });
+  }
+
+  resolverHabilitacion();
 
   const observer = new MutationObserver(function (mutations) {
     let deberiamosInyectar = false;
     mutations.forEach(function (mutation) {
       if (mutation.addedNodes.length > 0) deberiamosInyectar = true;
     });
-    if (deberiamosInyectar) inyectarBotones();
+    if (deberiamosInyectar) {
+      resolverHabilitacion();
+      inyectarBotones();
+    }
   });
 
   observer.observe(document.body, { childList: true, subtree: true });
@@ -133,6 +229,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     const botonCitar = e.target.closest(".btn-citar-seguimiento");
+    if (citasHabilitadas !== true) return;
     if (!botonCitar) return;
 
     e.preventDefault();
@@ -159,6 +256,8 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
       }
 
+      aplicarPrivacidadPorDefecto(formularioRespuesta);
+
       let inputOculto = document.getElementById("_quoted_followup_id");
       if (!inputOculto) {
         inputOculto = document.createElement("input");
@@ -179,7 +278,9 @@ document.addEventListener("DOMContentLoaded", function () {
         const nodoTexto = elementoSeguimiento.querySelector(
           ".read-only-content .rich_text_container",
         );
-        if (nodoTexto) textoCitado = nodoTexto.innerHTML;
+        if (nodoTexto) {
+          textoCitado = podarCitasAnidadas(nodoTexto.innerHTML) ?? "...";
+        }
 
         const autorNodo = elementoSeguimiento.querySelector(
           '.creator span[id^="user_"] a, .creator a[href*="user.form.php"]',
@@ -261,4 +362,24 @@ document.addEventListener("DOMContentLoaded", function () {
       insertarCita();
     }
   });
+
+  function aplicarPrivacidadPorDefecto(form) {
+    if (!citaPrivadaPorDefecto) return;
+
+    const checkbox = form.querySelector(
+      'input[type="checkbox"][name="is_private"]',
+    );
+
+    if (checkbox) {
+      if (!checkbox.checked) {
+        checkbox.checked = true;
+        checkbox.dispatchEvent(new Event("change", { bubbles: true }));
+      }
+      return;
+    }
+
+    const hidden = form.querySelector('input[type="hidden"][name="is_private"]');
+    if (hidden) hidden.value = "1";
+  }
+
 });
