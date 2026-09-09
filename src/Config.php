@@ -93,9 +93,9 @@ class Config extends CommonDBTM
         return $result;
     }
 
-    /**
-     * @return array{is_active: bool, default_private: bool}|null null si el
-     *         usuario no puede leer el objeto ITIL.
+        /**
+     * @return array{is_active: bool, default_private: bool, accepts_quotes: bool}|null
+     *         null si el usuario no puede leer el objeto ITIL.
      */
     public static function resolveForItem(string $itemtype, int $items_id): ?array
     {
@@ -108,7 +108,21 @@ class Config extends CommonDBTM
             return null;
         }
 
-        return self::resolveForEntity((int) $item->fields['entities_id']);
+        // Un ticket resuelto o cerrado no debe ofrecer el boton de citar.
+        // GLPI permite el seguimiento nativo igual (y eso reabre el ticket),
+        // pero no queremos que la cita sea el atajo para ese camino.
+        $bloqueados = array_merge(
+            $item::getClosedStatusArray(),
+            $item::getSolvedStatusArray()
+        );
+
+        $config = self::resolveForEntity((int) $item->fields['entities_id']);
+
+        return [
+            'is_active'       => $config['is_active'],
+            'default_private' => $config['default_private'],
+            'accepts_quotes'  => ! in_array((int) $item->fields['status'], $bloqueados, true),
+        ];
     }
 
     public static function isActiveForEntity(int $entities_id): bool
@@ -120,7 +134,9 @@ class Config extends CommonDBTM
     {
         $resolved = self::resolveForItem($itemtype, $items_id);
 
-        return $resolved !== null && $resolved['is_active'];
+        return $resolved !== null
+            && $resolved['is_active']
+            && $resolved['accepts_quotes'];
     }
 
     public static function saveForEntity(int $entities_id, array $input): bool
