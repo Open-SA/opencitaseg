@@ -2,6 +2,8 @@
 
 use GlpiPlugin\Opencitaseg\Config;
 
+include('../../../inc/includes.php');
+
 Session::checkRight('entity', UPDATE);
 
 if (isset($_POST['update'])) {

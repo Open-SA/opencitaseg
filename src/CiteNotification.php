@@ -217,14 +217,14 @@ final class CiteNotification
             'tag'    => 'opencitaseg.citedby',
             'label'  => __('User who quoted the follow-up', 'opencitaseg'),
             'value'  => true,
-            'events' => [self::EVENT],
+            'events' => \NotificationTarget::TAG_FOR_ALL_EVENTS,
         ]);
 
         $target->addTagToList([
             'tag'    => 'opencitaseg.citedate',
             'label'  => __('Date of the quote', 'opencitaseg'),
             'value'  => true,
-            'events' => [self::EVENT],
+            'events' => \NotificationTarget::TAG_FOR_ALL_EVENTS,
         ]);
     }
 
@@ -276,7 +276,10 @@ final class CiteNotification
         // El nombre real de un usuario es dato de entrada (LDAP o alta manual)
         // y el reemplazo de tags de NotificationTemplate no escapa: se escapa
         // acá para que no pueda inyectar HTML en el cuerpo del mail.
-        $authorName = \htmlescape($authorName);
+        //
+        // htmlspecialchars() en lugar de htmlescape(), que solo existe en
+        // GLPI 11.
+        $authorName = htmlspecialchars($authorName, ENT_QUOTES, 'UTF-8');
 
         NotificationEvent::raiseEvent(
             self::EVENT,

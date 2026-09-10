@@ -30,15 +30,9 @@
 
 use GlpiPlugin\Opencitaseg\CiteNotification;
 
-// El bump a 1.2.0 va en su propia rama chore/release-1.2.0 (guia §7),
-// no en la rama feat/notificaciones-cita.
-define('PLUGIN_OPENCITASEG_VERSION', '1.3.1');
-
-// Minimal GLPI version, inclusive
-define("PLUGIN_OPENCITASEG_MIN_GLPI_VERSION", "11.0.0");
-
-// Maximum GLPI version, exclusive
-define("PLUGIN_OPENCITASEG_MAX_GLPI_VERSION", "11.0.99");
+define('PLUGIN_OPENCITASEG_VERSION', '1.2.0-glpi10');
+define("PLUGIN_OPENCITASEG_MIN_GLPI_VERSION", "10.0.0");
+define("PLUGIN_OPENCITASEG_MAX_GLPI_VERSION", "10.0.99");
 
 /**
  * Init hooks of the plugin.
@@ -85,7 +79,7 @@ function plugin_init_opencitaseg(): void
     // generado desde los .po con tools/build-js-locales.py. Se registra
     // ANTES de citas.js para que ya este disponible en el DOMContentLoaded.
     $lang    = $_SESSION['glpilanguage'] ?? 'en_GB';
-    $basedir = Plugin::getPhpDir('opencitaseg') . '/public/js/locales/';
+    $basedir = Plugin::getPhpDir('opencitaseg') . '/js/locales/';
     if (! preg_match('/^[a-z]{2}_[A-Z]{2}$/', $lang) || ! file_exists($basedir . $lang . '.js')) {
         $lang = 'en_GB';
     }

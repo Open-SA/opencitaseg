@@ -2,6 +2,8 @@
 
 use GlpiPlugin\Opencitaseg\Config;
 
+include('../../../inc/includes.php');
+
 Session::checkLoginUser();
 
 header('Content-Type: application/json');
