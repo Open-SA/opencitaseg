@@ -4,8 +4,19 @@
  * Fuente: locales/en_GB.po
  */
 window.OPENCITASEG_I18N = {
+  "Author of the quoted follow-up": "Author of the quoted follow-up",
+  "Date of the quote": "Date of the quote",
+  "Enable quotes": "Enable quotes",
+  "Follow-up quoted": "Follow-up quoted",
+  "Inherit from parent entity": "Inherit from parent entity",
   "Quote": "Quote",
   "Quote this followup": "Quote this followup",
+  "Quote this task": "Quote this task",
+  "Quotes are currently disabled through inheritance.": "Quotes are currently disabled through inheritance.",
+  "Quotes are currently enabled through inheritance.": "Quotes are currently enabled through inheritance.",
+  "Quotes private by default": "Quotes private by default",
   "Quoting %s": "Quoting %s",
-  "User": "User"
+  "Unknown user": "Unknown user",
+  "User": "User",
+  "User who quoted the follow-up": "User who quoted the follow-up"
 };
