@@ -282,11 +282,23 @@ document.addEventListener("DOMContentLoaded", function () {
 
       aplicarPrivacidadPorDefecto(formularioRespuesta);
 
-      let inputTipo = document.getElementById("_quoted_itemtype");
+      let inputOculto = formularioRespuesta.querySelector(
+        'input[name="_quoted_followup_id"]',
+      );
+      if (!inputOculto) {
+        inputOculto = document.createElement("input");
+        inputOculto.type = "hidden";
+        inputOculto.name = "_quoted_followup_id";
+        formularioRespuesta.appendChild(inputOculto);
+      }
+      inputOculto.value = idSeguimiento;
+
+      let inputTipo = formularioRespuesta.querySelector(
+        'input[name="_quoted_itemtype"]',
+      );
       if (!inputTipo) {
         inputTipo = document.createElement("input");
         inputTipo.type = "hidden";
-        inputTipo.id = "_quoted_itemtype";
         inputTipo.name = "_quoted_itemtype";
         formularioRespuesta.appendChild(inputTipo);
       }

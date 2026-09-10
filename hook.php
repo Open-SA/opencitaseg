@@ -131,7 +131,7 @@ function plugin_opencitaseg_item_add($item)
         return;
     }
 
-        $targetId = (int) $_POST['_quoted_followup_id'];
+    $targetId = (int) $_POST['_quoted_followup_id'];
 
     // Compatibilidad: si el navegador sirve un citas.js anterior, el POST no
     // trae itemtype y el citado es un seguimiento, como antes.
@@ -190,13 +190,6 @@ function plugin_opencitaseg_pre_item_add($item)
     if (empty($item->input['_quoted_followup_id'])) {
         return $item;
     }
-    Toolbox::logInFile(
-        'opencitaseg',
-        'pre_item_add: ' . json_encode([
-            'itemtype' => $item->input['_quoted_itemtype'] ?? null,
-            'id'       => $item->input['_quoted_followup_id'] ?? null,
-        ]) . "\n"
-    );
 
     $target = Cite::loadQuotable(
         (string) ($item->input['_quoted_itemtype'] ?? 'ITILFollowup'),
