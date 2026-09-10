@@ -361,8 +361,14 @@ document.addEventListener("DOMContentLoaded", function () {
             .scrollIntoView({ behavior: "smooth", block: "center" });
 
           editor.focus();
-          editor.selection.select(editor.getBody(), true);
-          editor.selection.collapse(false);
+          quitarCitasDelEditor(editor);
+          limpiarParrafosVaciosIniciales(editor);
+
+          // La cita va al principio del cuerpo, no al final: el orden natural
+          // es cita primero y respuesta debajo. Insertar al final dejaba el
+          // parrafo vacio de TinyMCE por encima de la cita, y el texto ya
+          // escrito tambien.
+          editor.selection.setCursorLocation(editor.getBody(), 0);
           editor.execCommand("mceInsertContent", false, htmlCita);
           editor.selection.collapse(false);
 
@@ -420,4 +426,58 @@ document.addEventListener("DOMContentLoaded", function () {
     if (hidden) hidden.value = "1";
   }
 
+    // Saca las citas que ya haya en el editor antes de insertar una nueva.
+  //
+  // Cerrar el panel de respuesta no limpia TinyMCE, asi que citar A, cerrar y
+  // citar B dejaba las dos. Y como el blockquote es mceNonEditable, el usuario
+  // no puede borrar a mano la que no queria.
+  //
+  // Se reemplaza en lugar de acumular porque el formulario manda un solo
+  // _quoted_followup_id: la tabla cites nunca registro mas de una cita por
+  // respuesta, asi que mostrar dos era incoherente con lo que se persiste.
+  //
+  // Solo se quitan los bloques del plugin. El texto que el usuario haya
+  // escrito se conserva.
+  function quitarCitasDelEditor(editor) {
+    editor
+      .getBody()
+      .querySelectorAll("blockquote.opencitaseg-quote")
+      .forEach((cita) => {
+        // El template agrega un <p>&nbsp;</p> despues de cada cita; sin esto,
+        // cada cita descartada deja una linea en blanco acumulada.
+        const siguiente = cita.nextElementSibling;
+        if (
+          siguiente &&
+          siguiente.tagName === "P" &&
+          siguiente.textContent.replace(/\u00a0/g, "").trim() === "" &&
+          !siguiente.querySelector("img")
+        ) {
+          siguiente.remove();
+        }
+
+        cita.remove();
+      });
+  }
+
+    // Quita los parrafos vacios que quedan al principio del cuerpo, tanto el que
+  // TinyMCE crea por defecto como los que dejan las citas descartadas. Se corta
+  // en el primer nodo con contenido, asi no toca el texto del usuario.
+  function limpiarParrafosVaciosIniciales(editor) {
+    const cuerpo = editor.getBody();
+
+    while (cuerpo.firstElementChild) {
+      const primero = cuerpo.firstElementChild;
+
+      const vacio =
+        primero.tagName === "P" &&
+        primero.textContent.replace(/\u00a0/g, "").trim() === "" &&
+        !primero.querySelector("img");
+
+      if (!vacio) break;
+
+      primero.remove();
+    }
+  }
+
 });
+
