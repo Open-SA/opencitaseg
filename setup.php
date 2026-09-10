@@ -28,13 +28,13 @@
  * -------------------------------------------------------------------------
  */
 
-define('PLUGIN_OPENCITASEG_VERSION', '1.1.3');
+define('PLUGIN_OPENCITASEG_VERSION', '1.1.3-glpi10');
 
 // Minimal GLPI version, inclusive
-define("PLUGIN_OPENCITASEG_MIN_GLPI_VERSION", "11.0.0");
+define("PLUGIN_OPENCITASEG_MIN_GLPI_VERSION", "10.0.0");
 
 // Maximum GLPI version, exclusive
-define("PLUGIN_OPENCITASEG_MAX_GLPI_VERSION", "11.0.99");
+define("PLUGIN_OPENCITASEG_MAX_GLPI_VERSION", "10.0.99");
 
 /**
  * Init hooks of the plugin.
