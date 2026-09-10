@@ -1,6 +1,6 @@
 # Opencitaseg — GLPI Plugin
 
-Allows quoting ITIL follow-ups in GLPI changes, problems and tickets with a single click, improving communication and tracking within the timeline.
+Allows quoting ITIL follow-ups and tasks in GLPI changes, problems and tickets with a single click, improving communication and tracking within the timeline.
 
 ## Features
 
@@ -10,6 +10,9 @@ Allows quoting ITIL follow-ups in GLPI changes, problems and tickets with a sing
 * Interactive citations: Clicking the citation link smoothly scrolls to and highlights the original quoted followup.
 * Notifies the author of a follow-up when someone quotes it.
 * Maintains data integrity by securely linking source and target followups in the database.
+* Quotes tasks as well as follow-ups, on tickets, changes and problems.
+* Per-entity configuration with inheritance from the root entity.
+* Each answer allows only one citation. If you add another one before saving, the previous citation will be replaced, but the text will be preserved.
 
 ## Requirements
 
@@ -31,16 +34,26 @@ cd /var/www/glpi/plugins
 git clone https://github.com/Open-SA/opencitaseg.git opencitaseg
 ```
 
+## Configuration
+
+Quotes are configured per entity, in the **Follow-up quotes** tab of the entity form:
+
+* **Inherit from parent entity** — resolves the setting up the entity tree. The root entity always defines its own value.
+* **Enable quotes** — master switch. When disabled, the quote button is not shown and quotes are rejected server-side.
+* **Quotes private by default** — initial value of the private flag on a new quote.
+
+A quote of a private follow-up or task is always forced to private, regardless of this setting.
+
 ## Usage
 
-1. Open an existing change, problem or ticket that contains followups.
-2. Locate the followup you want to reply to and click the **"Citar"** (Quote) button next to it.
+1. Open an existing change, problem or ticket that contains follow-ups or tasks.
+2. Locate the follow-up or task you want to reply to and click the **"Quote"** button next to it.
 3. The new followup panel will open automatically, and the rich text editor will be populated with the cited text.
 4. Type your reply below the quote and click **Add**.
 
 ## Permissions
 
-The quote button is injected purely on the frontend. Server-side, the plugin natively respects GLPI's visibility rules. A user can only quote a followup if they have the necessary rights to view it (`canViewItem()`) and the right to add a new followup to the ITIL object.
+The quote button is injected purely on the frontend. Server-side, the plugin natively respects GLPI's visibility rules. A user can only quote a followup if they have the necessary rights to view it (`canViewItem()`) and the right to add a new followup to the ITIL object. Quotes are not offered on resolved or closed objects.
 
 ## Notifications
 
@@ -59,15 +72,22 @@ When a follow-up is quoted, the author of the quoted follow-up is notified.
 
 ```text
 opencitaseg/
-├── hook.php                        # Install/uninstall hooks & item_add logic
+├── hook.php                        # Install/uninstall hooks, DB schema & item_add logic
 ├── setup.php                       # Plugin registration (version, hooks, assets)
 ├── opencitaseg.xml                 # Marketplace metadata
+├── ajax/
+│   └── isactive.php                # Resolves the per-entity configuration for the client
+├── front/
+│   └── config.form.php             # Handles the entity configuration form submit
 ├── locales/                        # gettext catalogues (.po / .mo) for the 5 supported languages
+├── templates/
+│   └── config.html.twig            # Entity configuration tab
 ├── tools/
 │   └── build-js-locales.py         # Builds the JS dictionaries from the .po files
 ├── src/
 │   ├── Cite.php                    # DB object class for citation relations
-│   └── CiteNotification.php        # Notification event, recipient resolution and templates
+│   ├── CiteNotification.php        # Notification event, recipient resolution and templates
+│   └── Config.php                  # Per-entity configuration and inheritance resolution
 └── public/
     ├── css/
     │   └── citas.css               # Timeline quote styling and highlight

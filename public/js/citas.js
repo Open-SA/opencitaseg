@@ -38,6 +38,20 @@ document.addEventListener("DOMContentLoaded", function () {
   // msgid si el archivo de locale no llego a cargarse.
   const t = (msgid) => (window.OPENCITASEG_I18N || {})[msgid] || msgid;
 
+  // Objetos citables. Tiene que coincidir con Cite::QUOTABLE_TYPES en PHP:
+  // esta lista decide donde se dibuja el boton, y la de PHP decide que se
+  // acepta al guardar.
+  const TIPOS_CITABLES = [
+    "ITILFollowup",
+    "TicketTask",
+    "ChangeTask",
+    "ProblemTask",
+  ];
+
+  const SELECTOR_CITABLES = TIPOS_CITABLES.map(
+    (tipo) => `.timeline-item[data-itemtype="${tipo}"]`,
+  ).join(", ");
+
     // null = todavia no resuelto. Los botones no se dibujan hasta que el
   // endpoint conteste, asi evitamos el parpadeo de un boton que despues
   // habria que sacar.
@@ -100,11 +114,14 @@ document.addEventListener("DOMContentLoaded", function () {
       '.timeline-item[data-itemtype="ITILFollowup"]',
     );
 
-    seguimientos.forEach((item) => {
+        const citables = document.querySelectorAll(SELECTOR_CITABLES);
+
+    citables.forEach((item) => {
       if (item.querySelector(".btn-citar-seguimiento")) return;
 
-      const idSeguimiento = item.getAttribute("data-items-id");
-      if (!idSeguimiento) return;
+      const idItem = item.getAttribute("data-items-id");
+      const itemtype = item.getAttribute("data-itemtype");
+      if (!idItem || !itemtype) return;
 
       const contenedorAcciones = item.querySelector(".timeline-item-buttons");
 
@@ -113,8 +130,12 @@ document.addEventListener("DOMContentLoaded", function () {
         boton.href = "#";
         boton.className =
           "btn btn-sm btn-ghost-secondary btn-citar-seguimiento me-2";
-        boton.setAttribute("data-id", idSeguimiento);
-        boton.title = t("Quote this followup");
+        boton.setAttribute("data-id", idItem);
+        boton.setAttribute("data-itemtype", itemtype);
+        boton.title =
+          itemtype === "ITILFollowup"
+            ? t("Quote this followup")
+            : t("Quote this task");
         boton.innerHTML = '<i class="ti ti-quote"></i> ' + t("Quote");
 
         contenedorAcciones.insertBefore(boton, contenedorAcciones.firstChild);
@@ -207,7 +228,8 @@ document.addEventListener("DOMContentLoaded", function () {
   let citaOperacionEnCurso = false;
 
   document.body.addEventListener("click", function (e) {
-    const enlaceNavegacion = e.target.closest('a[href^="#ITILFollowup_"]');
+    const enlaceNavegacion = e.target.closest('a.opencitaseg-quote-link, a[href^="#ITILFollowup_"]',
+    );
     if (enlaceNavegacion) {
       e.preventDefault();
 
@@ -245,6 +267,8 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 
     const idSeguimiento = botonCitar.getAttribute("data-id");
+    const itemtypeCitado =
+      botonCitar.getAttribute("data-itemtype") || "ITILFollowup";
 
     const insertarCita = () => {
       const formularioRespuesta = document.querySelector(
@@ -258,18 +282,30 @@ document.addEventListener("DOMContentLoaded", function () {
 
       aplicarPrivacidadPorDefecto(formularioRespuesta);
 
-      let inputOculto = document.getElementById("_quoted_followup_id");
+      let inputOculto = formularioRespuesta.querySelector(
+        'input[name="_quoted_followup_id"]',
+      );
       if (!inputOculto) {
         inputOculto = document.createElement("input");
         inputOculto.type = "hidden";
-        inputOculto.id = "_quoted_followup_id";
         inputOculto.name = "_quoted_followup_id";
         formularioRespuesta.appendChild(inputOculto);
       }
       inputOculto.value = idSeguimiento;
 
-      const elementoSeguimiento = document.querySelector(
-        `#ITILFollowup_${idSeguimiento}`,
+      let inputTipo = formularioRespuesta.querySelector(
+        'input[name="_quoted_itemtype"]',
+      );
+      if (!inputTipo) {
+        inputTipo = document.createElement("input");
+        inputTipo.type = "hidden";
+        inputTipo.name = "_quoted_itemtype";
+        formularioRespuesta.appendChild(inputTipo);
+      }
+      inputTipo.value = itemtypeCitado;
+
+      const elementoSeguimiento = document.getElementById(
+        `${itemtypeCitado}_${idSeguimiento}`,
       );
       let textoCitado = "...";
       let autorCita = t("User");
@@ -300,7 +336,7 @@ document.addEventListener("DOMContentLoaded", function () {
       // The `opencitaseg-quote` class is added on top for timeline styling.
       const htmlCita = `
                     <blockquote contenteditable="false" class="mceNonEditable opencitaseg-quote" style="border-left: 3px solid #0078d4; padding-left: 10px; margin-left: 0; color: #555; background-color: #f8f9fa; padding: 10px; border-radius: 4px; user-select: none;">
-                        <strong><a href="#ITILFollowup_${idSeguimiento}" class="opencitaseg-quote-link" style="text-decoration: none; color: #0078d4;">
+                        <strong><a href="#${itemtypeCitado}_${idSeguimiento}" class="opencitaseg-quote-link" style="text-decoration: none; color: #0078d4;">
                             <i class="ti ti-link"></i> ${etiquetaCita}
                         </a>:</strong><br>
                         ${textoCitado}
@@ -325,8 +361,14 @@ document.addEventListener("DOMContentLoaded", function () {
             .scrollIntoView({ behavior: "smooth", block: "center" });
 
           editor.focus();
-          editor.selection.select(editor.getBody(), true);
-          editor.selection.collapse(false);
+          quitarCitasDelEditor(editor);
+          limpiarParrafosVaciosIniciales(editor);
+
+          // La cita va al principio del cuerpo, no al final: el orden natural
+          // es cita primero y respuesta debajo. Insertar al final dejaba el
+          // parrafo vacio de TinyMCE por encima de la cita, y el texto ya
+          // escrito tambien.
+          editor.selection.setCursorLocation(editor.getBody(), 0);
           editor.execCommand("mceInsertContent", false, htmlCita);
           editor.selection.collapse(false);
 
@@ -384,4 +426,58 @@ document.addEventListener("DOMContentLoaded", function () {
     if (hidden) hidden.value = "1";
   }
 
+    // Saca las citas que ya haya en el editor antes de insertar una nueva.
+  //
+  // Cerrar el panel de respuesta no limpia TinyMCE, asi que citar A, cerrar y
+  // citar B dejaba las dos. Y como el blockquote es mceNonEditable, el usuario
+  // no puede borrar a mano la que no queria.
+  //
+  // Se reemplaza en lugar de acumular porque el formulario manda un solo
+  // _quoted_followup_id: la tabla cites nunca registro mas de una cita por
+  // respuesta, asi que mostrar dos era incoherente con lo que se persiste.
+  //
+  // Solo se quitan los bloques del plugin. El texto que el usuario haya
+  // escrito se conserva.
+  function quitarCitasDelEditor(editor) {
+    editor
+      .getBody()
+      .querySelectorAll("blockquote.opencitaseg-quote")
+      .forEach((cita) => {
+        // El template agrega un <p>&nbsp;</p> despues de cada cita; sin esto,
+        // cada cita descartada deja una linea en blanco acumulada.
+        const siguiente = cita.nextElementSibling;
+        if (
+          siguiente &&
+          siguiente.tagName === "P" &&
+          siguiente.textContent.replace(/\u00a0/g, "").trim() === "" &&
+          !siguiente.querySelector("img")
+        ) {
+          siguiente.remove();
+        }
+
+        cita.remove();
+      });
+  }
+
+    // Quita los parrafos vacios que quedan al principio del cuerpo, tanto el que
+  // TinyMCE crea por defecto como los que dejan las citas descartadas. Se corta
+  // en el primer nodo con contenido, asi no toca el texto del usuario.
+  function limpiarParrafosVaciosIniciales(editor) {
+    const cuerpo = editor.getBody();
+
+    while (cuerpo.firstElementChild) {
+      const primero = cuerpo.firstElementChild;
+
+      const vacio =
+        primero.tagName === "P" &&
+        primero.textContent.replace(/\u00a0/g, "").trim() === "" &&
+        !primero.querySelector("img");
+
+      if (!vacio) break;
+
+      primero.remove();
+    }
+  }
+
 });
+
