@@ -30,6 +30,7 @@
 
 use GlpiPlugin\Opencitaseg\Cite;
 use GlpiPlugin\Opencitaseg\CiteNotification;
+use ITILFollowup;
 
 function plugin_opencitaseg_install()
 {
@@ -41,13 +42,40 @@ function plugin_opencitaseg_install()
         $query = "CREATE TABLE `$table` (
             `id` bigint unsigned NOT NULL AUTO_INCREMENT,
             `itilfollowups_id_source` bigint unsigned NOT NULL COMMENT 'ID de la respuesta nueva',
-            `itilfollowups_id_target` bigint unsigned NOT NULL COMMENT 'ID del seguimiento citado',
+            `itemtype_target` varchar(100) NOT NULL DEFAULT 'ITILFollowup' COMMENT 'Clase del objeto citado',
+            `items_id_target` bigint unsigned NOT NULL COMMENT 'ID del objeto citado',
             PRIMARY KEY (`id`),
             KEY `source` (`itilfollowups_id_source`),
-            KEY `target` (`itilfollowups_id_target`)
+            KEY `target` (`itemtype_target`, `items_id_target`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
 
         $DB->doQueryOrDie($query, $DB->error());
+    } else {
+        // Migracion a target polimorfico. Hasta 1.1.x el citado era siempre un
+        // ITILFollowup; ahora puede ser tambien una tarea. El source no cambia:
+        // la cita siempre se escribe desde el formulario de seguimiento nuevo.
+        //
+        // El DEFAULT de la columna nueva rellena las filas existentes con
+        // 'ITILFollowup', que es exactamente lo que eran, asi que no hace falta
+        // un UPDATE aparte.
+        if (! $DB->fieldExists($table, 'itemtype_target')) {
+            $DB->doQueryOrDie(
+                "ALTER TABLE `$table`
+                    ADD COLUMN `itemtype_target` varchar(100) NOT NULL DEFAULT 'ITILFollowup'
+                        COMMENT 'Clase del objeto citado'
+                    AFTER `itilfollowups_id_source`",
+                $DB->error()
+            );
+        }
+
+        if ($DB->fieldExists($table, 'itilfollowups_id_target')) {
+            $DB->doQueryOrDie(
+                "ALTER TABLE `$table`
+                    CHANGE COLUMN `itilfollowups_id_target` `items_id_target`
+                        bigint unsigned NOT NULL COMMENT 'ID del objeto citado'",
+                $DB->error()
+            );
+        }
     }
 
     $configTable = 'glpi_plugin_opencitaseg_configs';
@@ -103,21 +131,25 @@ function plugin_opencitaseg_item_add($item)
         return;
     }
 
-    $targetId = (int) $_POST['_quoted_followup_id'];
+        $targetId = (int) $_POST['_quoted_followup_id'];
 
-    $targetFollowup = new ITILFollowup();
-    if (! $targetFollowup->getFromDB($targetId)) {
+    // Compatibilidad: si el navegador sirve un citas.js anterior, el POST no
+    // trae itemtype y el citado es un seguimiento, como antes.
+    $targetType = (string) ($_POST['_quoted_itemtype'] ?? 'ITILFollowup');
+
+    $target = Cite::loadQuotable($targetType, $targetId);
+    if ($target === null) {
         return;
     }
 
     if (
-        $targetFollowup->fields['itemtype'] !== $item->fields['itemtype']
-        || (int) $targetFollowup->fields['items_id'] !== (int) $item->fields['items_id']
+        $target['parent_itemtype'] !== $item->fields['itemtype']
+        || $target['parent_id'] !== (int) $item->fields['items_id']
     ) {
         return;
     }
 
-    if (! $targetFollowup->canViewItem()) {
+    if (! $target['item']->canViewItem()) {
         return;
     }
 
@@ -133,14 +165,16 @@ function plugin_opencitaseg_item_add($item)
     $cite = new Cite();
     $cite->add([
         'itilfollowups_id_source' => $item->fields['id'],
-        'itilfollowups_id_target' => $targetId,
+        'itemtype_target'         => $targetType,
+        'items_id_target'         => $targetId,
     ]);
 
-    // La notificación se levanta después de persistir la relación y después de
-    // que canViewItem() confirmó que quien cita tenía derecho a ver el
-    // seguimiento citado. CiteNotification aplica sus propios filtros
-    // (seguimiento privado, autocita, autor inexistente).
-    CiteNotification::raiseForCite($item, $targetFollowup);
+    // Las citas de tareas no notifican en esta version: la plantilla del mail
+    // esta redactada para seguimientos y cambiarla no alcanzaria a las
+    // instalaciones que ya la tienen creada.
+    if ($target['item'] instanceof ITILFollowup) {
+        CiteNotification::raiseForCite($item, $target['item']);
+    }
 }
 
 /**
@@ -156,22 +190,31 @@ function plugin_opencitaseg_pre_item_add($item)
     if (empty($item->input['_quoted_followup_id'])) {
         return $item;
     }
+    Toolbox::logInFile(
+        'opencitaseg',
+        'pre_item_add: ' . json_encode([
+            'itemtype' => $item->input['_quoted_itemtype'] ?? null,
+            'id'       => $item->input['_quoted_followup_id'] ?? null,
+        ]) . "\n"
+    );
 
-    $target = new ITILFollowup();
-    if (! $target->getFromDB((int) $item->input['_quoted_followup_id'])) {
+    $target = Cite::loadQuotable(
+        (string) ($item->input['_quoted_itemtype'] ?? 'ITILFollowup'),
+        (int) $item->input['_quoted_followup_id']
+    );
+
+    if ($target === null) {
         return $item;
     }
 
-    // El citado tiene que pertenecer al mismo objeto ITIL, igual que en
-    // plugin_opencitaseg_item_add().
     if (
-        $target->fields['itemtype'] !== ($item->input['itemtype'] ?? null)
-        || (int) $target->fields['items_id'] !== (int) ($item->input['items_id'] ?? 0)
+        $target['parent_itemtype'] !== ($item->input['itemtype'] ?? null)
+        || $target['parent_id'] !== (int) ($item->input['items_id'] ?? 0)
     ) {
         return $item;
     }
 
-    if ((int) $target->fields['is_private'] === 1) {
+    if ($target['is_private']) {
         $item->input['is_private'] = 1;
     }
 

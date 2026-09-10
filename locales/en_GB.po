@@ -69,3 +69,7 @@ msgstr "Quotes are currently enabled through inheritance."
 #. Notice shown when the entity inherits a disabled configuration.
 msgid "Quotes are currently disabled through inheritance."
 msgstr "Quotes are currently disabled through inheritance."
+
+#. Tooltip of the quote button on a task.
+msgid "Quote this task"
+msgstr "Quote this task"

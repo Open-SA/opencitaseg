@@ -68,3 +68,7 @@ msgstr "Las citas están habilitadas por herencia."
 #. Notice shown when the entity inherits a disabled configuration.
 msgid "Quotes are currently disabled through inheritance."
 msgstr "Las citas están deshabilitadas por herencia."
+
+#. Tooltip of the quote button on a task.
+msgid "Quote this task"
+msgstr "Citar esta tarea"
