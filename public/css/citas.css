@@ -28,8 +28,6 @@
 
 /* Transient highlight applied when navigating to a quoted follow-up. */
 .opencitaseg-highlight {
-    /* Outline en lugar de fondo: las tareas ya tienen fondo amarillo propio
-       de GLPI y un cambio de background no se distingue. */
     outline: 3px solid #0078d4;
     outline-offset: 2px;
     transition: outline-color 0.3s ease;

@@ -13,7 +13,6 @@ class Config extends CommonDBTM
 {
     public static $rightname = 'entity';
 
-    /** Memo por request: la resolucion recorre la cadena de entidades. */
     private static array $resolved = [];
 
     public static function getTable($classname = null)
@@ -49,7 +48,7 @@ class Config extends CommonDBTM
         return true;
     }
 
-        /**
+    /**
      * @return array{is_active: bool, default_private: bool}
      */
     public static function resolveForEntity(int $entities_id): array
@@ -58,8 +57,6 @@ class Config extends CommonDBTM
             return self::$resolved[$entities_id];
         }
 
-        // Fail-open: sin ninguna fila en la cadena, las citas quedan activas
-        // y publicas, que es el comportamiento previo a este plugin.
         $result  = ['is_active' => true, 'default_private' => false];
         $current = $entities_id;
 
@@ -108,9 +105,6 @@ class Config extends CommonDBTM
             return null;
         }
 
-        // Un ticket resuelto o cerrado no debe ofrecer el boton de citar.
-        // GLPI permite el seguimiento nativo igual (y eso reabre el ticket),
-        // pero no queremos que la cita sea el atajo para ese camino.
         $bloqueados = array_merge(
             $item::getClosedStatusArray(),
             $item::getSolvedStatusArray()

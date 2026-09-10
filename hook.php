@@ -51,13 +51,6 @@ function plugin_opencitaseg_install()
 
         $DB->doQueryOrDie($query, $DB->error());
     } else {
-        // Migracion a target polimorfico. Hasta 1.1.x el citado era siempre un
-        // ITILFollowup; ahora puede ser tambien una tarea. El source no cambia:
-        // la cita siempre se escribe desde el formulario de seguimiento nuevo.
-        //
-        // El DEFAULT de la columna nueva rellena las filas existentes con
-        // 'ITILFollowup', que es exactamente lo que eran, asi que no hace falta
-        // un UPDATE aparte.
         if (! $DB->fieldExists($table, 'itemtype_target')) {
             $DB->doQueryOrDie(
                 "ALTER TABLE `$table`
@@ -94,9 +87,6 @@ function plugin_opencitaseg_install()
         $DB->doQueryOrDie($query, $DB->error());
     }
 
-    // La entidad raiz no puede heredar: siempre define su propio valor.
-    // Se siembra activa para no cambiar el comportamiento de instalaciones
-    // que vienen de una version anterior sin configuracion.
     $DB->doQueryOrDie(
         "INSERT IGNORE INTO `$configTable`
             (`entities_id`, `use_parent_config`, `is_active`, `default_private`)
@@ -121,7 +111,7 @@ function plugin_opencitaseg_uninstall()
 }
 
 
-function plugin_opencitaseg_item_add($item)
+function plugin_opencitaseg_item_add(object $item)
 {
     if (! $item instanceof ITILFollowup) {
         return;
@@ -133,8 +123,7 @@ function plugin_opencitaseg_item_add($item)
 
     $targetId = (int) $_POST['_quoted_followup_id'];
 
-    // Compatibilidad: si el navegador sirve un citas.js anterior, el POST no
-    // trae itemtype y el citado es un seguimiento, como antes.
+
     $targetType = (string) ($_POST['_quoted_itemtype'] ?? 'ITILFollowup');
 
     $target = Cite::loadQuotable($targetType, $targetId);
@@ -169,9 +158,6 @@ function plugin_opencitaseg_item_add($item)
         'items_id_target'         => $targetId,
     ]);
 
-    // Las citas de tareas no notifican en esta version: la plantilla del mail
-    // esta redactada para seguimientos y cambiarla no alcanzaria a las
-    // instalaciones que ya la tienen creada.
     if ($target['item'] instanceof ITILFollowup) {
         CiteNotification::raiseForCite($item, $target['item']);
     }
@@ -185,7 +171,7 @@ function plugin_opencitaseg_item_add($item)
  * real, y es el que impide que alguien publique contenido privado mandando
  * el POST a mano.
  */
-function plugin_opencitaseg_pre_item_add($item)
+function plugin_opencitaseg_pre_item_add(object $item)
 {
     if (empty($item->input['_quoted_followup_id'])) {
         return $item;

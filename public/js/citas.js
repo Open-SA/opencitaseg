@@ -27,20 +27,8 @@
  */
 
 document.addEventListener("DOMContentLoaded", function () {
-  // Use GLPI's native client-side translation helper. GLPI loads every
-  // plugin's gettext catalogue into the global `i18n` object (see
-  // FrontEndAssetsExtension::localesJs()), so `__(msgid, 'opencitaseg')`
-  // resolves against this plugin's `.mo` files and honours the user's
-  // locale. If `__` is somehow unavailable, fall back to the msgid itself.
-  // Diccionario inyectado por setup.php (public/js/locales/<lang>.js).
-  // GLPI carga los .mo de plugins solo del lado PHP, asi que window.__()
-  // con un dominio de plugin devuelve el msgid sin traducir. Fallback al
-  // msgid si el archivo de locale no llego a cargarse.
   const t = (msgid) => (window.OPENCITASEG_I18N || {})[msgid] || msgid;
 
-  // Objetos citables. Tiene que coincidir con Cite::QUOTABLE_TYPES en PHP:
-  // esta lista decide donde se dibuja el boton, y la de PHP decide que se
-  // acepta al guardar.
   const TIPOS_CITABLES = [
     "ITILFollowup",
     "TicketTask",
@@ -52,9 +40,6 @@ document.addEventListener("DOMContentLoaded", function () {
     (tipo) => `.timeline-item[data-itemtype="${tipo}"]`,
   ).join(", ");
 
-    // null = todavia no resuelto. Los botones no se dibujan hasta que el
-  // endpoint conteste, asi evitamos el parpadeo de un boton que despues
-  // habria que sacar.
   let citasHabilitadas = null;
   let citaPrivadaPorDefecto = false;
 
@@ -85,7 +70,7 @@ document.addEventListener("DOMContentLoaded", function () {
     );
   }
 
-    // Poda las citas que el seguimiento citado ya tenia adentro. Sin esto, citar
+  // Poda las citas que el seguimiento citado ya tenia adentro. Sin esto, citar
   // una respuesta que a su vez citaba a otra arrastra las dos, y el contenido
   // crece en cada vuelta del intercambio.
   //
@@ -93,8 +78,6 @@ document.addEventListener("DOMContentLoaded", function () {
   // una cita), para que el llamador use el placeholder en vez de un bloque
   // vacio.
   function podarCitasAnidadas(html) {
-    // DOMParser produce un documento inerte: no ejecuta scripts ni dispara la
-    // carga de recursos, a diferencia de asignar innerHTML en un div suelto.
     const doc = new DOMParser().parseFromString(html, "text/html");
 
     doc.body.querySelectorAll("blockquote").forEach((cita) => {
@@ -172,8 +155,6 @@ document.addEventListener("DOMContentLoaded", function () {
         inyectarBotones();
       })
       .catch(() => {
-        // Fail-open, igual que la resolucion en PHP. El gate real esta en
-        // hook.php; esto es solo UX.
         citasHabilitadas = true;
         inyectarBotones();
       });
@@ -256,10 +237,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     e.preventDefault();
 
-    // Guard against a second click landing while a previous citation is
-    // still being inserted (e.g. the user re-clicking after seeing the
-    // panel take a moment to open) — without this, both clicks would each
-    // insert their own copy of the quote.
     if (citaOperacionEnCurso) return;
     citaOperacionEnCurso = true;
     const liberarGuard = () => {
@@ -326,14 +303,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       }
 
-      // "Quoting %s" — format string kept translatable; %s is the author.
       const etiquetaCita = t("Quoting %s").replace("%s", autorCita);
-
-      // NOTE: the inline styles below are intentional. This blockquote is
-      // saved as part of the follow-up HTML content and is later rendered
-      // in contexts where the plugin CSS is NOT loaded (mail notifications,
-      // openpdf exports, etc.), so the styling must travel with the content.
-      // The `opencitaseg-quote` class is added on top for timeline styling.
       const htmlCita = `
                     <blockquote contenteditable="false" class="mceNonEditable opencitaseg-quote" style="border-left: 3px solid #0078d4; padding-left: 10px; margin-left: 0; color: #555; background-color: #f8f9fa; padding: 10px; border-radius: 4px; user-select: none;">
                         <strong><a href="#${itemtypeCitado}_${idSeguimiento}" class="opencitaseg-quote-link" style="text-decoration: none; color: #0078d4;">
@@ -363,11 +333,6 @@ document.addEventListener("DOMContentLoaded", function () {
           editor.focus();
           quitarCitasDelEditor(editor);
           limpiarParrafosVaciosIniciales(editor);
-
-          // La cita va al principio del cuerpo, no al final: el orden natural
-          // es cita primero y respuesta debajo. Insertar al final dejaba el
-          // parrafo vacio de TinyMCE por encima de la cita, y el texto ya
-          // escrito tambien.
           editor.selection.setCursorLocation(editor.getBody(), 0);
           editor.execCommand("mceInsertContent", false, htmlCita);
           editor.selection.collapse(false);
@@ -388,17 +353,11 @@ document.addEventListener("DOMContentLoaded", function () {
       );
 
       if (btnToggle) {
-        // Wait for Bootstrap's own "finished opening" event instead of a
-        // fixed delay — the collapse transition can take longer than any
-        // flat timeout, and interacting with the editor mid-transition is
-        // what caused the "not in standards mode" / getRng race before.
         panelSeguimiento.addEventListener("shown.bs.collapse", insertarCita, {
           once: true,
         });
         btnToggle.click();
       } else {
-        // Sin boton de responder, GLPI decidio no ofrecer el formulario.
-        // No forzamos el collapse: seria pasar por encima de esa decision.
         liberarGuard();
         return;
       }
@@ -426,7 +385,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (hidden) hidden.value = "1";
   }
 
-    // Saca las citas que ya haya en el editor antes de insertar una nueva.
+  // Saca las citas que ya haya en el editor antes de insertar una nueva.
   //
   // Cerrar el panel de respuesta no limpia TinyMCE, asi que citar A, cerrar y
   // citar B dejaba las dos. Y como el blockquote es mceNonEditable, el usuario
@@ -459,7 +418,7 @@ document.addEventListener("DOMContentLoaded", function () {
       });
   }
 
-    // Quita los parrafos vacios que quedan al principio del cuerpo, tanto el que
+  // Quita los parrafos vacios que quedan al principio del cuerpo, tanto el que
   // TinyMCE crea por defecto como los que dejan las citas descartadas. Se corta
   // en el primer nodo con contenido, asi no toca el texto del usuario.
   function limpiarParrafosVaciosIniciales(editor) {

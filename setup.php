@@ -30,14 +30,10 @@
 
 use GlpiPlugin\Opencitaseg\CiteNotification;
 
-// El bump a 1.2.0 va en su propia rama chore/release-1.2.0 (guia §7),
-// no en la rama feat/notificaciones-cita.
 define('PLUGIN_OPENCITASEG_VERSION', '1.2.0');
 
-// Minimal GLPI version, inclusive
 define("PLUGIN_OPENCITASEG_MIN_GLPI_VERSION", "11.0.0");
 
-// Maximum GLPI version, exclusive
 define("PLUGIN_OPENCITASEG_MAX_GLPI_VERSION", "11.0.99");
 
 /**
@@ -63,11 +59,6 @@ function plugin_init_opencitaseg(): void
     'addtabon' => ['Entity'],
     ]);
 
-    // Notificación "te citaron en un seguimiento".
-    //
-    // Plugin::doHook() enruta los hooks de item por get_class($param), y el
-    // parámetro que recibe un hook de notificación es el NotificationTarget:
-    // la clave es 'NotificationTargetTicket', NO 'Ticket'.
     foreach (CiteNotification::getTargetClasses() as $targetClass) {
         $PLUGIN_HOOKS['item_get_events']['opencitaseg'][$targetClass]
         = [CiteNotification::class, 'addEvents'];
@@ -79,11 +70,6 @@ function plugin_init_opencitaseg(): void
         = [CiteNotification::class, 'addData'];
     }
 
-    // El catalogo gettext del plugin se carga solo del lado PHP: GLPI no
-    // expone los dominios de plugin al objeto `i18n` del front. Por eso las
-    // cadenas que usa citas.js se sirven como un diccionario JS por idioma,
-    // generado desde los .po con tools/build-js-locales.py. Se registra
-    // ANTES de citas.js para que ya este disponible en el DOMContentLoaded.
     $lang    = $_SESSION['glpilanguage'] ?? 'en_GB';
     $basedir = Plugin::getPhpDir('opencitaseg') . '/public/js/locales/';
     if (! preg_match('/^[a-z]{2}_[A-Z]{2}$/', $lang) || ! file_exists($basedir . $lang . '.js')) {

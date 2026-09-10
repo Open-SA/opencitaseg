@@ -70,7 +70,6 @@ use User;
  */
 final class CiteNotification
 {
-    /** Nombre del evento registrado en glpi_notifications.event */
     public const EVENT = 'opencitaseg_cite';
 
     /**
@@ -108,10 +107,6 @@ final class CiteNotification
 
         return $classes;
     }
-
-    // ---------------------------------------------------------------------
-    // Hooks de notificación
-    // ---------------------------------------------------------------------
 
     /**
      * Hook item_get_events: agrega el evento del plugin a la lista de eventos
@@ -178,8 +173,6 @@ final class CiteNotification
             return;
         }
 
-        // addToRecipientsList descarta por su cuenta usuarios borrados,
-        // inactivos, fuera de vigencia o sin perfil en la entidad del objeto.
         $target->addToRecipientsList([
             'language' => $user->fields['language'],
             'users_id' => $user->fields['id'],
@@ -228,10 +221,6 @@ final class CiteNotification
         ]);
     }
 
-    // ---------------------------------------------------------------------
-    // Disparo del evento
-    // ---------------------------------------------------------------------
-
     /**
      * Levanta el evento para el autor del seguimiento citado.
      *
@@ -240,21 +229,17 @@ final class CiteNotification
      */
     public static function raiseForCite(ITILFollowup $source, ITILFollowup $quoted): void
     {
-        // Fail-closed: no notificamos desde un seguimiento privado porque no
-        // podemos evaluar el derecho SEEPRIVATE en nombre del destinatario.
         if ((int) ($source->fields['is_private'] ?? 0) === 1) {
             return;
         }
 
         $recipientId = (int) ($quoted->fields['users_id'] ?? 0);
         if ($recipientId <= 0) {
-            // Seguimiento sin autor (p. ej. creado por el colector de correo).
             return;
         }
 
         $authorId = (int) ($source->fields['users_id'] ?? 0);
         if ($authorId === $recipientId) {
-            // Autocita: no tiene sentido notificar.
             return;
         }
 
@@ -273,9 +258,6 @@ final class CiteNotification
             ? $author->getFriendlyName()
             : __('Unknown user', 'opencitaseg');
 
-        // El nombre real de un usuario es dato de entrada (LDAP o alta manual)
-        // y el reemplazo de tags de NotificationTemplate no escapa: se escapa
-        // acá para que no pueda inyectar HTML en el cuerpo del mail.
         $authorName = \htmlescape($authorName);
 
         NotificationEvent::raiseEvent(
@@ -294,10 +276,6 @@ final class CiteNotification
         );
     }
 
-    // ---------------------------------------------------------------------
-    // Install / uninstall
-    // ---------------------------------------------------------------------
-
     public static function install(): bool
     {
         foreach (self::getSupportedItemtypes() as $itemtype) {
@@ -311,8 +289,6 @@ final class CiteNotification
 
     public static function uninstall(): bool
     {
-        // El purge de Notification encadena Notification_NotificationTemplate
-        // y NotificationTarget (Notification::cleanDBonPurge).
         $notification = new Notification();
         foreach ($notification->find(['event' => self::EVENT]) as $row) {
             $notification->delete(['id' => $row['id']], true);
@@ -330,8 +306,6 @@ final class CiteNotification
     {
         $notification = new Notification();
 
-        // Idempotente: en una reinstalación no duplicamos la configuración
-        // (y respetamos los cambios que el administrador haya hecho).
         if (count($notification->find(['itemtype' => $itemtype, 'event' => self::EVENT])) > 0) {
             return true;
         }
@@ -463,7 +437,6 @@ final class CiteNotification
             ],
         ];
 
-        // es_ES y en_GB comparten texto con es_AR / la traducción por defecto.
         $translations['es_ES'] = $translations['es_AR'];
         $translations['en_GB'] = $translations[''];
 
