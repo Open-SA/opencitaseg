@@ -32,7 +32,7 @@ use GlpiPlugin\Opencitaseg\CiteNotification;
 
 // El bump a 1.2.0 va en su propia rama chore/release-1.2.0 (guia §7),
 // no en la rama feat/notificaciones-cita.
-define('PLUGIN_OPENCITASEG_VERSION', '1.3.1');
+define('PLUGIN_OPENCITASEG_VERSION', '1.2.0');
 
 // Minimal GLPI version, inclusive
 define("PLUGIN_OPENCITASEG_MIN_GLPI_VERSION", "11.0.0");
