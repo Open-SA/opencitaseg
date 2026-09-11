@@ -104,6 +104,10 @@ function plugin_opencitaseg_install()
         $DB->error()
     );
 
+    if (! CiteNotification::install()) {
+        return false;
+    }
+
     return true;
 }
 
@@ -116,6 +120,9 @@ function plugin_opencitaseg_uninstall()
             $DB->doQueryOrDie("DROP TABLE `$table`", $DB->error());
         }
     }
+
+    CiteNotification::uninstall();
+
 
     return true;
 }
