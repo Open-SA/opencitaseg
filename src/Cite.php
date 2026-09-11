@@ -90,8 +90,11 @@ class Cite extends CommonDBTM
             $parentType = (string) $item->fields['itemtype'];
             $parentId   = (int) $item->fields['items_id'];
         } elseif ($item instanceof CommonITILTask) {
-            $parentType = $item::getItilObjectItemType();
-            $parentId   = (int) $item->fields[$item::$items_id];
+            // GLPI 10 no expone $items_id como propiedad estatica en las
+            // tareas. La columna del padre se deriva del itemtype, que es lo
+            // que hace el core (ver CommonITILTask), y funciona igual en 11.
+            $parentType = $item->getItilObjectItemType();
+            $parentId   = (int) $item->fields[getForeignKeyFieldForItemType($parentType)];
         } else {
             return null;
         }
