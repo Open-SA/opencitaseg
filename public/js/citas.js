@@ -251,8 +251,11 @@ document.addEventListener("DOMContentLoaded", function () {
     const elementoCitado = document.getElementById(
       `${itemtypeCitado}_${idSeguimiento}`,
     );
+
+    // GLPI marca los seguimientos y tareas privadas con un span .is-private
+    // dentro del timeline-item, igual en GLPI 10 y 11.
     const citadoEsPrivado = elementoCitado
-      ? elementoCitado.classList.contains("private-item")
+      ? elementoCitado.querySelector(".is-private") !== null
       : false;
 
     const insertarCita = () => {
