@@ -114,7 +114,7 @@ document.addEventListener("DOMContentLoaded", function () {
       '.timeline-item[data-itemtype="ITILFollowup"]',
     );
 
-        const citables = document.querySelectorAll(SELECTOR_CITABLES);
+    const citables = document.querySelectorAll(SELECTOR_CITABLES);
 
     citables.forEach((item) => {
       if (item.querySelector(".btn-citar-seguimiento")) return;
@@ -143,7 +143,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-      let resolucionEnCurso = false;
+  let resolucionEnCurso = false;
 
   // La timeline puede renderizarse despues del DOMContentLoaded, asi que la
   // resolucion se intenta tambien desde el MutationObserver. Se ejecuta una
@@ -228,7 +228,8 @@ document.addEventListener("DOMContentLoaded", function () {
   let citaOperacionEnCurso = false;
 
   document.body.addEventListener("click", function (e) {
-    const enlaceNavegacion = e.target.closest('a.opencitaseg-quote-link, a[href^="#ITILFollowup_"]',
+    const enlaceNavegacion = e.target.closest(
+      'a.opencitaseg-quote-link, a[href^="#ITILFollowup_"]',
     );
     if (enlaceNavegacion) {
       e.preventDefault();
@@ -270,6 +271,13 @@ document.addEventListener("DOMContentLoaded", function () {
     const itemtypeCitado =
       botonCitar.getAttribute("data-itemtype") || "ITILFollowup";
 
+    const elementoCitado = document.getElementById(
+      `${itemtypeCitado}_${idSeguimiento}`,
+    );
+    const citadoEsPrivado = elementoCitado
+      ? elementoCitado.classList.contains("private-item")
+      : false;
+
     const insertarCita = () => {
       const formularioRespuesta = document.querySelector(
         "#new-ITILFollowup-block form",
@@ -280,7 +288,7 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
       }
 
-      aplicarPrivacidadPorDefecto(formularioRespuesta);
+      aplicarPrivacidadPorDefecto(formularioRespuesta, citadoEsPrivado);
 
       let inputOculto = formularioRespuesta.querySelector(
         'input[name="_quoted_followup_id"]',
@@ -405,79 +413,86 @@ document.addEventListener("DOMContentLoaded", function () {
     } else {
       insertarCita();
     }
-  });
 
-  function aplicarPrivacidadPorDefecto(form) {
-    if (!citaPrivadaPorDefecto) return;
+    function aplicarPrivacidadPorDefecto(form, citadoEsPrivado) {
+      if (!citadoEsPrivado && !citaPrivadaPorDefecto) return;
 
-    const checkbox = form.querySelector(
-      'input[type="checkbox"][name="is_private"]',
-    );
+      const checkbox = form.querySelector(
+        'input[type="checkbox"][name="is_private"]',
+      );
 
-    if (checkbox) {
-      if (!checkbox.checked) {
-        checkbox.checked = true;
-        checkbox.dispatchEvent(new Event("change", { bubbles: true }));
-      }
-      return;
-    }
-
-    const hidden = form.querySelector('input[type="hidden"][name="is_private"]');
-    if (hidden) hidden.value = "1";
-  }
-
-    // Saca las citas que ya haya en el editor antes de insertar una nueva.
-  //
-  // Cerrar el panel de respuesta no limpia TinyMCE, asi que citar A, cerrar y
-  // citar B dejaba las dos. Y como el blockquote es mceNonEditable, el usuario
-  // no puede borrar a mano la que no queria.
-  //
-  // Se reemplaza en lugar de acumular porque el formulario manda un solo
-  // _quoted_followup_id: la tabla cites nunca registro mas de una cita por
-  // respuesta, asi que mostrar dos era incoherente con lo que se persiste.
-  //
-  // Solo se quitan los bloques del plugin. El texto que el usuario haya
-  // escrito se conserva.
-  function quitarCitasDelEditor(editor) {
-    editor
-      .getBody()
-      .querySelectorAll("blockquote.opencitaseg-quote")
-      .forEach((cita) => {
-        // El template agrega un <p>&nbsp;</p> despues de cada cita; sin esto,
-        // cada cita descartada deja una linea en blanco acumulada.
-        const siguiente = cita.nextElementSibling;
-        if (
-          siguiente &&
-          siguiente.tagName === "P" &&
-          siguiente.textContent.replace(/\u00a0/g, "").trim() === "" &&
-          !siguiente.querySelector("img")
-        ) {
-          siguiente.remove();
+      if (checkbox) {
+        if (!checkbox.checked) {
+          checkbox.checked = true;
+          checkbox.dispatchEvent(new Event("change", { bubbles: true }));
         }
 
-        cita.remove();
-      });
-  }
+        if (citadoEsPrivado) {
+          checkbox.title = t(
+            "The quoted item is private, so this reply will be private too",
+          );
+        }
+
+        return;
+      }
+
+      const hidden = form.querySelector(
+        'input[type="hidden"][name="is_private"]',
+      );
+      if (hidden) hidden.value = "1";
+    }
+
+    // Saca las citas que ya haya en el editor antes de insertar una nueva.
+    //
+    // Cerrar el panel de respuesta no limpia TinyMCE, asi que citar A, cerrar y
+    // citar B dejaba las dos. Y como el blockquote es mceNonEditable, el usuario
+    // no puede borrar a mano la que no queria.
+    //
+    // Se reemplaza en lugar de acumular porque el formulario manda un solo
+    // _quoted_followup_id: la tabla cites nunca registro mas de una cita por
+    // respuesta, asi que mostrar dos era incoherente con lo que se persiste.
+    //
+    // Solo se quitan los bloques del plugin. El texto que el usuario haya
+    // escrito se conserva.
+    function quitarCitasDelEditor(editor) {
+      editor
+        .getBody()
+        .querySelectorAll("blockquote.opencitaseg-quote")
+        .forEach((cita) => {
+          // El template agrega un <p>&nbsp;</p> despues de cada cita; sin esto,
+          // cada cita descartada deja una linea en blanco acumulada.
+          const siguiente = cita.nextElementSibling;
+          if (
+            siguiente &&
+            siguiente.tagName === "P" &&
+            siguiente.textContent.replace(/\u00a0/g, "").trim() === "" &&
+            !siguiente.querySelector("img")
+          ) {
+            siguiente.remove();
+          }
+
+          cita.remove();
+        });
+    }
 
     // Quita los parrafos vacios que quedan al principio del cuerpo, tanto el que
-  // TinyMCE crea por defecto como los que dejan las citas descartadas. Se corta
-  // en el primer nodo con contenido, asi no toca el texto del usuario.
-  function limpiarParrafosVaciosIniciales(editor) {
-    const cuerpo = editor.getBody();
+    // TinyMCE crea por defecto como los que dejan las citas descartadas. Se corta
+    // en el primer nodo con contenido, asi no toca el texto del usuario.
+    function limpiarParrafosVaciosIniciales(editor) {
+      const cuerpo = editor.getBody();
 
-    while (cuerpo.firstElementChild) {
-      const primero = cuerpo.firstElementChild;
+      while (cuerpo.firstElementChild) {
+        const primero = cuerpo.firstElementChild;
 
-      const vacio =
-        primero.tagName === "P" &&
-        primero.textContent.replace(/\u00a0/g, "").trim() === "" &&
-        !primero.querySelector("img");
+        const vacio =
+          primero.tagName === "P" &&
+          primero.textContent.replace(/\u00a0/g, "").trim() === "" &&
+          !primero.querySelector("img");
 
-      if (!vacio) break;
+        if (!vacio) break;
 
-      primero.remove();
+        primero.remove();
+      }
     }
-  }
-
+  });
 });
-
