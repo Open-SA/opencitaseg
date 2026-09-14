@@ -73,3 +73,7 @@ msgstr "Les citations sont actuellement désactivées par héritage."
 #. Tooltip of the quote button on a task.
 msgid "Quote this task"
 msgstr "Citer cette tâche"
+
+#. Tooltip on the private checkbox when the quoted item is private.
+msgid "The quoted item is private, so this reply will be private too"
+msgstr "L'élément cité est privé, donc cette réponse le sera aussi"

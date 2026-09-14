@@ -73,3 +73,7 @@ msgstr "Quotes are currently disabled through inheritance."
 #. Tooltip of the quote button on a task.
 msgid "Quote this task"
 msgstr "Quote this task"
+
+#. Tooltip on the private checkbox when the quoted item is private.
+msgid "The quoted item is private, so this reply will be private too"
+msgstr "The quoted item is private, so this reply will be private too"
