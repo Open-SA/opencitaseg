@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", function () {
     (tipo) => `.timeline-item[data-itemtype="${tipo}"]`,
   ).join(", ");
 
-    // null = todavia no resuelto. Los botones no se dibujan hasta que el
+  // null = todavia no resuelto. Los botones no se dibujan hasta que el
   // endpoint conteste, asi evitamos el parpadeo de un boton que despues
   // habria que sacar.
   let citasHabilitadas = null;
@@ -85,7 +85,7 @@ document.addEventListener("DOMContentLoaded", function () {
     );
   }
 
-    // Poda las citas que el seguimiento citado ya tenia adentro. Sin esto, citar
+  // Poda las citas que el seguimiento citado ya tenia adentro. Sin esto, citar
   // una respuesta que a su vez citaba a otra arrastra las dos, y el contenido
   // crece en cada vuelta del intercambio.
   //
@@ -274,8 +274,11 @@ document.addEventListener("DOMContentLoaded", function () {
     const elementoCitado = document.getElementById(
       `${itemtypeCitado}_${idSeguimiento}`,
     );
+
+    // GLPI marca los seguimientos y tareas privadas con un span .is-private
+    // dentro del timeline-item, igual en GLPI 10 y 11.
     const citadoEsPrivado = elementoCitado
-      ? elementoCitado.classList.contains("private-item")
+      ? elementoCitado.querySelector(".is-private") !== null
       : false;
 
     const insertarCita = () => {
