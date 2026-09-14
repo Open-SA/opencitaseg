@@ -16,6 +16,7 @@ window.OPENCITASEG_I18N = {
   "Quotes are currently enabled through inheritance.": "Quotes are currently enabled through inheritance.",
   "Quotes private by default": "Quotes private by default",
   "Quoting %s": "Quoting %s",
+  "The quoted item is private, so this reply will be private too": "The quoted item is private, so this reply will be private too",
   "Unknown user": "Unknown user",
   "User": "User",
   "User who quoted the follow-up": "User who quoted the follow-up"
