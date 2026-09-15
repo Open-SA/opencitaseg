@@ -38,5 +38,31 @@
             <button type="submit" name="update" class="btn btn-primary">{{ __('Save') }}</button>
          </div>
       {% endif %}
+      <script>
+         (function () {
+            // El contenido de la pestaña se inyecta con jQuery.html(), que
+            // extrae los <script> y los evalúa fuera del DOM: document.currentScript
+            // es null acá. Por eso ubicamos el formulario por el input oculto de
+            // la entidad en lugar de subir por los ancestros.
+            const heredar = document.querySelector(
+               'form input[name="entities_id"][value="{{ entities_id }}"]',
+            )?.form?.querySelector('[name="use_parent_config"]');
+
+            if (!heredar) return;
+
+            const form = heredar.form;
+            const propios = [
+               ...form.querySelectorAll('[name="is_active"], [name="default_private"]'),
+            ];
+
+            const sincronizar = () => {
+               const hereda = heredar.value === '1';
+               propios.forEach((campo) => { campo.disabled = hereda; });
+            };
+
+            heredar.addEventListener('change', sincronizar);
+            sincronizar();
+         })();
+      </script>
    </form>
 </div>
