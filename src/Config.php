@@ -136,16 +136,29 @@ class Config extends CommonDBTM
     public static function saveForEntity(int $entities_id, array $input): bool
     {
         $config = new self();
+        $existe = $config->getFromDBByCrit(['entities_id' => $entities_id]);
+
+        // La raiz nunca hereda.
+        $hereda = $entities_id !== 0 && (int) ($input['use_parent_config'] ?? 0) === 1;
 
         $data = [
             'entities_id'       => $entities_id,
-            // La raiz nunca hereda.
-            'use_parent_config' => $entities_id === 0 ? 0 : (int) ($input['use_parent_config'] ?? 0),
-            'is_active'         => (int) ($input['is_active'] ?? 0),
-            'default_private'   => (int) ($input['default_private'] ?? 0),
+            'use_parent_config' => $hereda ? 1 : 0,
         ];
 
-        if ($config->getFromDBByCrit(['entities_id' => $entities_id])) {
+        if ($hereda) {
+            // Cuando se hereda, los campos propios no se tocan: quedan como
+            // estaban para que desmarcar la herencia devuelva la configuracion
+            // anterior y no lo que el navegador haya mandado en un select
+            // deshabilitado.
+            $data['is_active']       = $existe ? (int) $config->fields['is_active'] : 1;
+            $data['default_private'] = $existe ? (int) $config->fields['default_private'] : 0;
+        } else {
+            $data['is_active']       = (int) ($input['is_active'] ?? 0);
+            $data['default_private'] = (int) ($input['default_private'] ?? 0);
+        }
+
+        if ($existe) {
             $data['id'] = $config->fields['id'];
 
             return (bool) $config->update($data);
