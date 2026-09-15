@@ -33,7 +33,7 @@ class Config extends CommonDBTM
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
         if ($item instanceof Entity && Session::haveRight(self::$rightname, READ)) {
-            return self::getTypeName();
+            return self::createTabEntry(self::getTypeName(), 0, self::class, self::getIcon());
         }
 
         return '';
