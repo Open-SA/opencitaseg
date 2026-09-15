@@ -91,11 +91,61 @@ document.addEventListener("DOMContentLoaded", function () {
     return doc.body.innerHTML;
   }
 
+  // Saca las citas que ya haya en el editor antes de insertar una nueva.
+  //
+  // Cerrar el panel de respuesta no limpia TinyMCE, asi que citar A, cerrar y
+  // citar B dejaba las dos. Y como el blockquote es mceNonEditable, el usuario
+  // no puede borrar a mano la que no queria.
+  //
+  // Se reemplaza en lugar de acumular porque el formulario manda un solo
+  // _quoted_followup_id: la tabla cites nunca registro mas de una cita por
+  // respuesta, asi que mostrar dos era incoherente con lo que se persiste.
+  //
+  // Solo se quitan los bloques del plugin. El texto que el usuario haya
+  // escrito se conserva.
+  function quitarCitasDelEditor(editor) {
+    editor
+      .getBody()
+      .querySelectorAll("blockquote.opencitaseg-quote")
+      .forEach((cita) => {
+        // El template agrega un <p>&nbsp;</p> despues de cada cita; sin esto,
+        // cada cita descartada deja una linea en blanco acumulada.
+        const siguiente = cita.nextElementSibling;
+        if (
+          siguiente &&
+          siguiente.tagName === "P" &&
+          siguiente.textContent.replace(/\u00a0/g, "").trim() === "" &&
+          !siguiente.querySelector("img")
+        ) {
+          siguiente.remove();
+        }
+
+        cita.remove();
+      });
+  }
+
+  // Quita los parrafos vacios que quedan al principio del cuerpo, tanto el que
+  // TinyMCE crea por defecto como los que dejan las citas descartadas. Se corta
+  // en el primer nodo con contenido, asi no toca el texto del usuario.
+  function limpiarParrafosVaciosIniciales(editor) {
+    const cuerpo = editor.getBody();
+
+    while (cuerpo.firstElementChild) {
+      const primero = cuerpo.firstElementChild;
+
+      const vacio =
+        primero.tagName === "P" &&
+        primero.textContent.replace(/\u00a0/g, "").trim() === "" &&
+        !primero.querySelector("img");
+
+      if (!vacio) break;
+
+      primero.remove();
+    }
+  }
+
   function inyectarBotones() {
     if (citasHabilitadas !== true) return;
-    const seguimientos = document.querySelectorAll(
-      '.timeline-item[data-itemtype="ITILFollowup"]',
-    );
 
     const citables = document.querySelectorAll(SELECTOR_CITABLES);
 
@@ -174,6 +224,43 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   observer.observe(document.body, { childList: true, subtree: true });
+
+  // Al cerrar el panel de respuesta descartamos la cita pendiente.
+  //
+  // El bloque es mceNonEditable, asi que el usuario no puede borrarlo a mano:
+  // si cito por error y cierra, al reabrir con Responder se encontraba la cita
+  // ahi sin forma de sacarla, y los inputs ocultos seguian apuntando al objeto
+  // citado.
+  //
+  // En el #6 habiamos descartado limpiar al cerrar porque se llevaba puesto el
+  // borrador. Ya no aplica: quitarCitasDelEditor() saca solo los bloques del
+  // plugin y el texto escrito se conserva, que es el comportamiento nativo de
+  // GLPI para el borrador.
+  function descartarCitaPendiente() {
+    const form = document.querySelector("#new-ITILFollowup-block form");
+    if (!form) return;
+
+    form
+      .querySelectorAll(
+        'input[name="_quoted_followup_id"], input[name="_quoted_itemtype"]',
+      )
+      .forEach((input) => input.remove());
+
+    const textarea = form.querySelector('textarea[name="content"]');
+    if (!textarea || typeof tinymce === "undefined") return;
+
+    const editor = tinymce.get(textarea.id);
+    if (editor && editor.initialized) {
+      quitarCitasDelEditor(editor);
+      limpiarParrafosVaciosIniciales(editor);
+    }
+  }
+
+  document.body.addEventListener("hidden.bs.collapse", function (e) {
+    if (e.target && e.target.id === "new-ITILFollowup-block") {
+      descartarCitaPendiente();
+    }
+  });
 
   // Polls until the given TinyMCE editor has finished its async init, then
   // calls onReady(editor). Calling editor.focus()/execCommand() before this
@@ -402,59 +489,6 @@ document.addEventListener("DOMContentLoaded", function () {
         'input[type="hidden"][name="is_private"]',
       );
       if (hidden) hidden.value = "1";
-    }
-
-    // Saca las citas que ya haya en el editor antes de insertar una nueva.
-    //
-    // Cerrar el panel de respuesta no limpia TinyMCE, asi que citar A, cerrar y
-    // citar B dejaba las dos. Y como el blockquote es mceNonEditable, el usuario
-    // no puede borrar a mano la que no queria.
-    //
-    // Se reemplaza en lugar de acumular porque el formulario manda un solo
-    // _quoted_followup_id: la tabla cites nunca registro mas de una cita por
-    // respuesta, asi que mostrar dos era incoherente con lo que se persiste.
-    //
-    // Solo se quitan los bloques del plugin. El texto que el usuario haya
-    // escrito se conserva.
-    function quitarCitasDelEditor(editor) {
-      editor
-        .getBody()
-        .querySelectorAll("blockquote.opencitaseg-quote")
-        .forEach((cita) => {
-          // El template agrega un <p>&nbsp;</p> despues de cada cita; sin esto,
-          // cada cita descartada deja una linea en blanco acumulada.
-          const siguiente = cita.nextElementSibling;
-          if (
-            siguiente &&
-            siguiente.tagName === "P" &&
-            siguiente.textContent.replace(/\u00a0/g, "").trim() === "" &&
-            !siguiente.querySelector("img")
-          ) {
-            siguiente.remove();
-          }
-
-          cita.remove();
-        });
-    }
-
-    // Quita los parrafos vacios que quedan al principio del cuerpo, tanto el que
-    // TinyMCE crea por defecto como los que dejan las citas descartadas. Se corta
-    // en el primer nodo con contenido, asi no toca el texto del usuario.
-    function limpiarParrafosVaciosIniciales(editor) {
-      const cuerpo = editor.getBody();
-
-      while (cuerpo.firstElementChild) {
-        const primero = cuerpo.firstElementChild;
-
-        const vacio =
-          primero.tagName === "P" &&
-          primero.textContent.replace(/\u00a0/g, "").trim() === "" &&
-          !primero.querySelector("img");
-
-        if (!vacio) break;
-
-        primero.remove();
-      }
     }
   });
 });
