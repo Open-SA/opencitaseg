@@ -55,7 +55,7 @@ msgstr "Heredar de la entidad padre"
 
 #. Entity config: master switch for the quote feature.
 msgid "Enable quotes"
-msgstr "Habilitar citas"
+msgstr "Habilitar citas de seguimientos"
 
 #. Entity config: initial value of is_private on a new quote.
 msgid "Quotes private by default"
@@ -76,3 +76,16 @@ msgstr "Citar esta tarea"
 #. Tooltip on the private checkbox when the quoted item is private.
 msgid "The quoted item is private, so this reply will be private too"
 msgstr "El elemento citado es privado, así que esta respuesta también lo será"
+
+#. Entity config: master switch for quoting tasks.
+msgid "Enable quotes on tasks"
+msgstr "Habilitar citas en tareas"
+
+msgid "Quotes on follow-ups are enabled through inheritance."
+msgstr "Las cotizaciones en los seguimientos están habilitadas por herencia."
+msgid "Quotes on follow-ups are disabled through inheritance."
+msgstr "Las cotizaciones en los seguimientos están deshabilitadas por herencia."
+msgid "Quotes on tasks are enabled through inheritance."
+msgstr "Las cotizaciones en las tareas están habilitadas por herencia."
+msgid "Quotes on tasks are disabled through inheritance."
+msgstr "Las cotizaciones en las tareas están deshabilitadas por herencia."

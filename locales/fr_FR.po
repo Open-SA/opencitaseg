@@ -56,7 +56,7 @@ msgstr "Hériter de l'entité parente"
 
 #. Entity config: master switch for the quote feature.
 msgid "Enable quotes"
-msgstr "Activer les citations"
+msgstr "Activer les citations sur les suivis"
 
 #. Entity config: initial value of is_private on a new quote.
 msgid "Quotes private by default"
@@ -77,3 +77,19 @@ msgstr "Citer cette tâche"
 #. Tooltip on the private checkbox when the quoted item is private.
 msgid "The quoted item is private, so this reply will be private too"
 msgstr "L'élément cité est privé, donc cette réponse le sera aussi"
+
+#. Entity config: master switch for quoting tasks.
+msgid "Enable quotes on tasks"
+msgstr "Activer les citations sur les tâches"
+
+msgid "Quotes on follow-ups are enabled through inheritance."
+msgstr "Les devis sur les suivis sont activés par héritage."
+
+msgid "Quotes on follow-ups are disabled through inheritance."
+msgstr "Les devis sur les suivis sont désactivés par héritage."
+
+msgid "Quotes on tasks are enabled through inheritance."
+msgstr "Les devis sur les tâches sont activés par héritage."
+
+msgid "Quotes on tasks are disabled through inheritance."
+msgstr "Les devis sur les tâches sont désactivés par héritage."

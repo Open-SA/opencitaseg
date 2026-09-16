@@ -56,7 +56,7 @@ msgstr "Inherit from parent entity"
 
 #. Entity config: master switch for the quote feature.
 msgid "Enable quotes"
-msgstr "Enable quotes"
+msgstr "Enable quotes on followups"
 
 #. Entity config: initial value of is_private on a new quote.
 msgid "Quotes private by default"
@@ -77,3 +77,7 @@ msgstr "Quote this task"
 #. Tooltip on the private checkbox when the quoted item is private.
 msgid "The quoted item is private, so this reply will be private too"
 msgstr "The quoted item is private, so this reply will be private too"
+
+#. Entity config: master switch for quoting tasks.
+msgid "Enable quotes on tasks"
+msgstr "Enable quotes on tasks"

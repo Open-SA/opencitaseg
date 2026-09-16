@@ -145,7 +145,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function inyectarBotones() {
-    if (citasHabilitadas !== true) return;
+    if (citasHabilitadas === null) return;
 
     const citables = document.querySelectorAll(SELECTOR_CITABLES);
 
@@ -155,6 +155,9 @@ document.addEventListener("DOMContentLoaded", function () {
       const idItem = item.getAttribute("data-items-id");
       const itemtype = item.getAttribute("data-itemtype");
       if (!idItem || !itemtype) return;
+
+      const esTarea = itemtype !== "ITILFollowup";
+      if (esTarea ? !citasHabilitadas.tareas : !citasHabilitadas.seguimientos) return;
 
       const contenedorAcciones = item.querySelector(".timeline-item-buttons");
 
@@ -200,12 +203,15 @@ document.addEventListener("DOMContentLoaded", function () {
     )
       .then((r) => (r.ok ? r.json() : { active: false }))
       .then((data) => {
-        citasHabilitadas = data.active === true;
+        citasHabilitadas = {
+          seguimientos: data.active === true,
+          tareas: data.active_tasks === true,
+        };
         citaPrivadaPorDefecto = data.default_private === true;
         inyectarBotones();
       })
       .catch(() => {
-        citasHabilitadas = true;
+        citasHabilitadas = { seguimientos: true, tareas: true };
         inyectarBotones();
       });
   }
@@ -320,7 +326,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     const botonCitar = e.target.closest(".btn-citar-seguimiento");
-    if (citasHabilitadas !== true) return;
+    if (citasHabilitadas === null) return;
     if (!botonCitar) return;
 
     e.preventDefault();
