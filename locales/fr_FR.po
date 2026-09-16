@@ -83,13 +83,13 @@ msgid "Enable quotes on tasks"
 msgstr "Activer les citations sur les tâches"
 
 msgid "Quotes on follow-ups are enabled through inheritance."
-msgstr "Les devis sur les suivis sont activés par héritage."
+msgstr "Les citations sur les suivis sont activées par héritage."
 
 msgid "Quotes on follow-ups are disabled through inheritance."
-msgstr "Les devis sur les suivis sont désactivés par héritage."
+msgstr "Les citations sur les suivis sont désactivées par héritage."
 
 msgid "Quotes on tasks are enabled through inheritance."
-msgstr "Les devis sur les tâches sont activés par héritage."
+msgstr "Les citations sur les tâches sont activées par héritage."
 
 msgid "Quotes on tasks are disabled through inheritance."
-msgstr "Les devis sur les tâches sont désactivés par héritage."
+msgstr "Les citations sur les tâches sont désactivées par héritage."
