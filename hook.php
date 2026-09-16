@@ -87,11 +87,35 @@ function plugin_opencitaseg_install()
             `use_parent_config` tinyint NOT NULL DEFAULT 1 COMMENT 'Hereda de la entidad padre',
             `is_active` tinyint NOT NULL DEFAULT 1 COMMENT 'Citas habilitadas en la entidad',
             `default_private` tinyint NOT NULL DEFAULT 0 COMMENT 'Valor inicial de is_private en la cita',
+            `is_active_tasks` tinyint NOT NULL DEFAULT 1 COMMENT 'Citas habilitadas sobre tareas',
             PRIMARY KEY (`id`),
             UNIQUE KEY `entities_id` (`entities_id`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
 
         $DB->doQueryOrDie($query, $DB->error());
+    }
+
+    if (! $DB->fieldExists($configTable, 'is_active_tasks')) {
+        $DB->doQueryOrDie(
+            "ALTER TABLE `$configTable`
+                ADD COLUMN `is_active_tasks` tinyint NOT NULL DEFAULT 1
+                    COMMENT 'Citas habilitadas sobre tareas'
+                AFTER `is_active`",
+            $DB->error()
+        );
+    }
+
+    // La entidad raiz no puede heredar: siempre define su propio valor.
+    // Se siembra activa para no cambiar el comportamiento de instalaciones
+    // que vienen de una version anterior sin configuracion.
+    if (! $DB->fieldExists($configTable, 'is_active_tasks')) {
+        $DB->doQueryOrDie(
+            "ALTER TABLE `$configTable`
+                ADD COLUMN `is_active_tasks` tinyint NOT NULL DEFAULT 1
+                    COMMENT 'Citas habilitadas sobre tareas'
+                AFTER `is_active`",
+            $DB->error()
+        );
     }
 
     // La entidad raiz no puede heredar: siempre define su propio valor.
@@ -164,6 +188,16 @@ function plugin_opencitaseg_item_add($item)
         ! \GlpiPlugin\Opencitaseg\Config::isActiveForItem(
             (string) $item->fields['itemtype'],
             (int) $item->fields['items_id']
+        )
+    ) {
+        return;
+    }
+
+    if (
+        ! \GlpiPlugin\Opencitaseg\Config::acceptsQuote(
+            (string) $item->fields['itemtype'],
+            (int) $item->fields['items_id'],
+            $targetType
         )
     ) {
         return;

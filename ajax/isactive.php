@@ -21,8 +21,7 @@ if ($items_id <= 0 || ! in_array($itemtype, ['Ticket', 'Change', 'Problem'], tru
 $resolved = Config::resolveForItem($itemtype, $items_id);
 
 echo json_encode([
-    'active'          => $resolved !== null
-                         && $resolved['is_active']
-                         && $resolved['accepts_quotes'],
+    'active'          => $resolved !== null && $resolved['accepts_quotes'] && $resolved['is_active'],
+    'active_tasks'    => $resolved !== null && $resolved['accepts_quotes'] && $resolved['is_active_tasks'],
     'default_private' => $resolved !== null && $resolved['default_private'],
 ]);

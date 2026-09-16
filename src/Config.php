@@ -8,6 +8,7 @@ use CommonITILObject;
 use Entity;
 use Glpi\Application\View\TemplateRenderer;
 use Session;
+use CommonITILTask;
 
 class Config extends CommonDBTM
 {
@@ -58,9 +59,7 @@ class Config extends CommonDBTM
             return self::$resolved[$entities_id];
         }
 
-        // Fail-open: sin ninguna fila en la cadena, las citas quedan activas
-        // y publicas, que es el comportamiento previo a este plugin.
-        $result  = ['is_active' => true, 'default_private' => false];
+        $result  = ['is_active' => true, 'is_active_tasks' => true, 'default_private' => false];
         $current = $entities_id;
 
         for ($depth = 0; $depth < 50; $depth++) {
@@ -70,6 +69,7 @@ class Config extends CommonDBTM
                 if ($current === 0 || ! (int) $config->fields['use_parent_config']) {
                     $result = [
                         'is_active'       => (bool) $config->fields['is_active'],
+                        'is_active_tasks' => (bool) $config->fields['is_active_tasks'],
                         'default_private' => (bool) $config->fields['default_private'],
                     ];
                     break;
@@ -122,6 +122,7 @@ class Config extends CommonDBTM
             'is_active'       => $config['is_active'],
             'default_private' => $config['default_private'],
             'accepts_quotes'  => ! in_array((int) $item->fields['status'], $bloqueados, true),
+            'is_active_tasks' => $config['is_active_tasks'],
         ];
     }
 
@@ -158,10 +159,12 @@ class Config extends CommonDBTM
             // anterior y no lo que el navegador haya mandado en un select
             // deshabilitado.
             $data['is_active']       = $existe ? (int) $config->fields['is_active'] : 1;
+            $data['is_active_tasks'] = $existe ? (int) $config->fields['is_active_tasks'] : 1;
             $data['default_private'] = $existe ? (int) $config->fields['default_private'] : 0;
         } else {
             $data['is_active']       = (int) ($input['is_active'] ?? 0);
             $data['default_private'] = (int) ($input['default_private'] ?? 0);
+            $data['is_active_tasks'] = (int) ($input['is_active_tasks'] ?? 0);
         }
 
         if ($existe) {
@@ -178,15 +181,48 @@ class Config extends CommonDBTM
         $config = new self();
         $exists = $config->getFromDBByCrit(['entities_id' => $entities_id]);
 
+        $hereda = $entities_id !== 0
+            && ($exists ? (int) $config->fields['use_parent_config'] === 1 : true);
+
+        $resuelto = self::resolveForEntity($entities_id);
+
+        // Cuando se hereda, los selects muestran el valor resuelto y no el
+        // propio de la entidad: de otro modo la pantalla contradice al cartel.
+        // El valor propio se conserva igual en la base, saveForEntity() no lo
+        // pisa mientras la herencia siga activa.
         TemplateRenderer::getInstance()->display('@opencitaseg/config.html.twig', [
             'entities_id'       => $entities_id,
             'is_root'           => $entities_id === 0,
-            'use_parent_config' => $exists ? (int) $config->fields['use_parent_config'] : ($entities_id === 0 ? 0 : 1),
-            'is_active'         => $exists ? (int) $config->fields['is_active'] : 1,
-            'default_private'   => $exists ? (int) $config->fields['default_private'] : 0,
-            'resolved_active'   => self::isActiveForEntity($entities_id),
+            'use_parent_config' => $hereda ? 1 : 0,
+            'is_active'         => $hereda
+                ? (int) $resuelto['is_active']
+                : ($exists ? (int) $config->fields['is_active'] : 1),
+            'is_active_tasks'   => $hereda
+                ? (int) $resuelto['is_active_tasks']
+                : ($exists ? (int) $config->fields['is_active_tasks'] : 1),
+            'default_private'   => $hereda
+                ? (int) $resuelto['default_private']
+                : ($exists ? (int) $config->fields['default_private'] : 0),
+            'resolved'          => $resuelto,
             'can_update'        => Session::haveRight(self::$rightname, UPDATE),
-            'save_url' => \Plugin::getWebDir('opencitaseg') . '/front/config.form.php',
+            'save_url'          => \Plugin::getWebDir('opencitaseg') . '/front/config.form.php',
         ]);
+    }
+
+    /**
+     * Si el objeto ITIL acepta una cita de este tipo de destino. Combina el
+     * estado del ticket (resuelto/cerrado) con el toggle que corresponda.
+     */
+    public static function acceptsQuote(string $itemtype, int $items_id, string $targetType): bool
+    {
+        $resolved = self::resolveForItem($itemtype, $items_id);
+
+        if ($resolved === null || ! $resolved['accepts_quotes']) {
+            return false;
+        }
+
+        return is_a($targetType, CommonITILTask::class, true)
+            ? $resolved['is_active_tasks']
+            : $resolved['is_active'];
     }
 }
