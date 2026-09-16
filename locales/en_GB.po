@@ -81,3 +81,15 @@ msgstr "The quoted item is private, so this reply will be private too"
 #. Entity config: master switch for quoting tasks.
 msgid "Enable quotes on tasks"
 msgstr "Enable quotes on tasks"
+
+msgid "Quotes on follow-ups are enabled through inheritance."
+msgstr "Quotes on follow-ups are enabled through inheritance."
+
+msgid "Quotes on follow-ups are disabled through inheritance."
+msgstr "Quotes on follow-ups are disabled through inheritance."
+
+msgid "Quotes on tasks are enabled through inheritance."
+msgstr "Quotes on tasks are enabled through inheritance."
+
+msgid "Quotes on tasks are disabled through inheritance."
+msgstr "Quotes on tasks are disabled through inheritance."
