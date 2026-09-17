@@ -2,7 +2,8 @@
    <name>opencitaseg</name>
    <key>opencitaseg</key>
    <state>stable</state>
-   <logo>https://raw.githubusercontent.com/Open-SA/opencitaseg/main/public/opencitaseg.png</logo>   <description>
+   <logo>https://raw.githubusercontent.com/Open-SA/opencitaseg/main/public/opencitaseg.png</logo> 
+   <description>
       <short>
          <en>opencitaseg GLPI plugin</en>
          <es>Plugin de citas para seguimientos de GLPI</es>
