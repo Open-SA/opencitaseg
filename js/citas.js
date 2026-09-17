@@ -174,7 +174,8 @@ document.addEventListener("DOMContentLoaded", function () {
       if (!idItem || !itemtype) return;
 
       const esTarea = itemtype !== "ITILFollowup";
-      if (esTarea ? !citasHabilitadas.tareas : !citasHabilitadas.seguimientos) return;
+      if (esTarea ? !citasHabilitadas.tareas : !citasHabilitadas.seguimientos)
+        return;
 
       const contenedorAcciones = item.querySelector(".timeline-item-buttons");
 
@@ -509,15 +510,18 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function aplicarPrivacidadPorDefecto(form, citadoEsPrivado) {
-      if (!citadoEsPrivado && !citaPrivadaPorDefecto) return;
+      const debePrivado = citadoEsPrivado || citaPrivadaPorDefecto;
 
       const checkbox = form.querySelector(
         'input[type="checkbox"][name="is_private"]',
       );
 
       if (checkbox) {
-        if (!checkbox.checked) {
-          checkbox.checked = true;
+        // Se sincroniza en los dos sentidos: si la cita anterior era privada y
+        // esta no lo es, hay que desmarcar. Sin esto la respuesta se guardaba
+        // privada sin que el usuario lo pidiera.
+        if (checkbox.checked !== debePrivado) {
+          checkbox.checked = debePrivado;
           checkbox.dispatchEvent(new Event("change", { bubbles: true }));
         }
 
@@ -525,6 +529,8 @@ document.addEventListener("DOMContentLoaded", function () {
           checkbox.title = t(
             "The quoted item is private, so this reply will be private too",
           );
+        } else {
+          checkbox.removeAttribute("title");
         }
 
         return;
@@ -533,7 +539,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const hidden = form.querySelector(
         'input[type="hidden"][name="is_private"]',
       );
-      if (hidden) hidden.value = "1";
+      if (hidden) hidden.value = debePrivado ? "1" : "0";
     }
   });
 });
