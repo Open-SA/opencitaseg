@@ -4,8 +4,20 @@
  * Fuente: locales/es_AR.po
  */
 window.OPENCITASEG_I18N = {
+  "Author of the quoted follow-up": "Autor del seguimiento citado",
+  "Date of the quote": "Fecha de la cita",
+  "Enable quotes": "Habilitar citas",
+  "Follow-up quoted": "Seguimiento citado",
+  "Inherit from parent entity": "Heredar de la entidad padre",
   "Quote": "Citar",
   "Quote this followup": "Citar este seguimiento",
+  "Quote this task": "Citar esta tarea",
+  "Quotes are currently disabled through inheritance.": "Las citas están deshabilitadas por herencia.",
+  "Quotes are currently enabled through inheritance.": "Las citas están habilitadas por herencia.",
+  "Quotes private by default": "Citas privadas por defecto",
   "Quoting %s": "Citando a %s",
-  "User": "Usuario"
+  "The quoted item is private, so this reply will be private too": "El elemento citado es privado, así que esta respuesta también lo será",
+  "Unknown user": "Usuario desconocido",
+  "User": "Usuario",
+  "User who quoted the follow-up": "Usuario que citó el seguimiento"
 };

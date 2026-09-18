@@ -1,0 +1,79 @@
+{% import "components/form/fields_macros.html.twig" as fields %}
+
+<div class="asset">
+    <form method="post" action="{{ save_url }}">
+      <input type="hidden" name="_glpi_csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="entities_id" value="{{ entities_id }}">
+
+      <div class="card-body">
+         <div class="row">
+            {% if not is_root %}
+               {{ fields.dropdownYesNo(
+                  'use_parent_config',
+                  use_parent_config,
+                  __('Inherit from parent entity', 'opencitaseg')
+               ) }}
+            {% endif %}
+
+            {{ fields.dropdownYesNo('is_active', is_active, __('Enable quotes', 'opencitaseg')) }}
+
+            {{ fields.dropdownYesNo(
+               'default_private',
+               default_private,
+               __('Quotes private by default', 'opencitaseg')
+            ) }}
+
+            {{ fields.dropdownYesNo('is_active_tasks', is_active_tasks, __('Enable quotes on tasks', 'opencitaseg')) }}
+         </div>
+
+         {% if not is_root and use_parent_config %}
+            <div class="alert alert-info">
+               <div>
+                  {{ resolved.is_active
+                     ? __('Quotes on follow-ups are enabled through inheritance.', 'opencitaseg')
+                     : __('Quotes on follow-ups are disabled through inheritance.', 'opencitaseg') }}
+               </div>
+               <div>
+                  {{ resolved.is_active_tasks
+                     ? __('Quotes on tasks are enabled through inheritance.', 'opencitaseg')
+                     : __('Quotes on tasks are disabled through inheritance.', 'opencitaseg') }}
+               </div>
+            </div>
+         {% endif %}
+      </div>
+
+      {% if can_update %}
+         <div class="card-footer text-end">
+            <button type="submit" name="update" class="btn btn-primary">{{ __('Save') }}</button>
+         </div>
+      {% endif %}
+      <script>
+         (function () {
+            // El contenido de la pestaña se inyecta con jQuery.html(), que
+            // extrae los <script> y los evalúa fuera del DOM: document.currentScript
+            // es null acá. Por eso ubicamos el formulario por el input oculto de
+            // la entidad en lugar de subir por los ancestros.
+            const heredar = document.querySelector(
+               'form input[name="entities_id"][value="{{ entities_id }}"]',
+            )?.form?.querySelector('[name="use_parent_config"]');
+
+            if (!heredar) return;
+
+            const form = heredar.form;
+            const propios = [
+               ...form.querySelectorAll(
+                  '[name="is_active"], [name="is_active_tasks"], [name="default_private"]',
+               ),
+            ];
+
+            const sincronizar = () => {
+               const hereda = heredar.value === '1';
+               propios.forEach((campo) => { campo.disabled = hereda; });
+            };
+
+            heredar.addEventListener('change', sincronizar);
+            sincronizar();
+         })();
+      </script>
+   </form>
+</div>

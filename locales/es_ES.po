@@ -1,11 +1,7 @@
 #
 msgid ""
 msgstr ""
-<<<<<<< HEAD
-"Project-Id-Version: opencitaseg 1.1.3\n"
-=======
-"Project-Id-Version: opencitaseg 1.1.3\n"
->>>>>>> 9fea86d (cambio v)
+"Project-Id-Version: opencitaseg 1.2.0\n"
 "Report-Msgid-Bugs-To: https://github.com/Open-SA/opencitaseg/issues\n"
 "Last-Translator: OpenSA\n"
 "Language-Team: es_ES\n"
@@ -37,3 +33,59 @@ msgid "Follow-up quote"
 msgid_plural "Follow-up quotes"
 msgstr[0] "Cita de seguimiento"
 msgstr[1] "Citas de seguimiento"
+
+msgid "Follow-up quoted"
+msgstr "Seguimiento citado"
+
+msgid "Author of the quoted follow-up"
+msgstr "Autor del seguimiento citado"
+
+msgid "User who quoted the follow-up"
+msgstr "Usuario que citó el seguimiento"
+
+msgid "Date of the quote"
+msgstr "Fecha de la cita"
+
+msgid "Unknown user"
+msgstr "Usuario desconocido"
+
+#. Entity config: whether the entity inherits its parent's settings.
+msgid "Inherit from parent entity"
+msgstr "Heredar de la entidad padre"
+
+#. Entity config: master switch for the quote feature.
+msgid "Enable quotes"
+msgstr "Habilitar citas de seguimientos"
+
+#. Entity config: initial value of is_private on a new quote.
+msgid "Quotes private by default"
+msgstr "Citas privadas por defecto"
+
+#. Notice shown when the entity inherits an enabled configuration.
+msgid "Quotes are currently enabled through inheritance."
+msgstr "Las citas están habilitadas por herencia."
+
+#. Notice shown when the entity inherits a disabled configuration.
+msgid "Quotes are currently disabled through inheritance."
+msgstr "Las citas están deshabilitadas por herencia."
+
+#. Tooltip of the quote button on a task.
+msgid "Quote this task"
+msgstr "Citar esta tarea"
+
+#. Tooltip on the private checkbox when the quoted item is private.
+msgid "The quoted item is private, so this reply will be private too"
+msgstr "El elemento citado es privado, así que esta respuesta también lo será"
+
+#. Entity config: master switch for quoting tasks.
+msgid "Enable quotes on tasks"
+msgstr "Habilitar citas en tareas"
+
+msgid "Quotes on follow-ups are enabled through inheritance."
+msgstr "Las citas en seguimientos están habilitadas por herencia."
+msgid "Quotes on follow-ups are disabled through inheritance."
+msgstr "Las citas en seguimientos están deshabilitadas por herencia."
+msgid "Quotes on tasks are enabled through inheritance."
+msgstr "Las citas en tareas están habilitadas por herencia."
+msgid "Quotes on tasks are disabled through inheritance."
+msgstr "Las citas en tareas están deshabilitadas por herencia."

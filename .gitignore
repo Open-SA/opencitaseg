@@ -5,3 +5,4 @@ composer.lock
 .gh_token
 *.min.*
 var
+repomix*

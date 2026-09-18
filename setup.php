@@ -28,12 +28,12 @@
  * -------------------------------------------------------------------------
  */
 
-define('PLUGIN_OPENCITASEG_VERSION', '1.1.3');
+use GlpiPlugin\Opencitaseg\CiteNotification;
 
-// Minimal GLPI version, inclusive
+define('PLUGIN_OPENCITASEG_VERSION', '1.2.0');
+
 define("PLUGIN_OPENCITASEG_MIN_GLPI_VERSION", "11.0.0");
 
-// Maximum GLPI version, exclusive
 define("PLUGIN_OPENCITASEG_MAX_GLPI_VERSION", "11.0.99");
 
 /**
@@ -50,11 +50,26 @@ function plugin_init_opencitaseg(): void
         'ITILFollowup' => 'plugin_opencitaseg_item_add',
     ];
 
-    // El catalogo gettext del plugin se carga solo del lado PHP: GLPI no
-    // expone los dominios de plugin al objeto `i18n` del front. Por eso las
-    // cadenas que usa citas.js se sirven como un diccionario JS por idioma,
-    // generado desde los .po con tools/build-js-locales.py. Se registra
-    // ANTES de citas.js para que ya este disponible en el DOMContentLoaded.
+    $PLUGIN_HOOKS['pre_item_add']['opencitaseg'] = [
+        'ITILFollowup' => 'plugin_opencitaseg_pre_item_add',
+    ];
+
+
+    Plugin::registerClass(\GlpiPlugin\Opencitaseg\Config::class, [
+    'addtabon' => ['Entity'],
+    ]);
+
+    foreach (CiteNotification::getTargetClasses() as $targetClass) {
+        $PLUGIN_HOOKS['item_get_events']['opencitaseg'][$targetClass]
+        = [CiteNotification::class, 'addEvents'];
+        $PLUGIN_HOOKS['item_add_targets']['opencitaseg'][$targetClass]
+        = [CiteNotification::class, 'addTargets'];
+        $PLUGIN_HOOKS['item_action_targets']['opencitaseg'][$targetClass]
+        = [CiteNotification::class, 'actionTargets'];
+        $PLUGIN_HOOKS['item_get_datas']['opencitaseg'][$targetClass]
+        = [CiteNotification::class, 'addData'];
+    }
+
     $lang    = $_SESSION['glpilanguage'] ?? 'en_GB';
     $basedir = Plugin::getPhpDir('opencitaseg') . '/public/js/locales/';
     if (! preg_match('/^[a-z]{2}_[A-Z]{2}$/', $lang) || ! file_exists($basedir . $lang . '.js')) {

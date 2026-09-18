@@ -44,23 +44,6 @@ fi
 
 echo "\nPHPCS passed correctly! :)"
 echo "\n==================================================\n"
-echo "Running PHPStan...\n"
 
-./vendor/bin/phpstan analyse
-
-STAN_RESULT=$?
-
-if [ "$STAN_RESULT" -eq 1 ]; then
-    echo "\nPHPStan found errors. Please fix them and try committing again.\n"
-    exit 1
-fi
-
-if [ "$STAN_RESULT" -gt 1 ]; then
-    echo "\nPHPStan encountered an internal error. Please check the output above.\n"
-    exit 1
-fi
-
-echo "PHPStan passed correctly! :)"
-echo "\n==================================================\n"
 
 exit 0

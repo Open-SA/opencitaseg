@@ -5,7 +5,8 @@ on:
     branches:
       - "main"
     tags:
-       - "*"
+      - "*"
+      - "!*-glpi10"
   pull_request:
   schedule:
     - cron: "0 0 * * *"
