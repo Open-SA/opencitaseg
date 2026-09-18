@@ -92,7 +92,7 @@ class Config extends CommonDBTM
         return $result;
     }
 
-        /**
+    /**
      * @return array{is_active: bool, default_private: bool, accepts_quotes: bool}|null
      *         null si el usuario no puede leer el objeto ITIL.
      */
@@ -109,7 +109,7 @@ class Config extends CommonDBTM
 
         $bloqueados = array_merge(
             $item::getClosedStatusArray(),
-            $item::getSolvedStatusArray()
+            $item::getSolvedStatusArray(),
         );
 
         $config = self::resolveForEntity((int) $item->fields['entities_id']);
