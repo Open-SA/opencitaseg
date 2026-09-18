@@ -464,6 +464,17 @@ final class CiteNotification
                     . "<p>##lang.%TYPE%.title## : ##%TYPE%.title##</p>\n"
                     . '<p><a href="##%TYPE%.url##">##%TYPE%.url##</a></p>',
             ],
+            'ja_JP' => [
+                'subject'      => '##%TYPE%.action## : ##%TYPE%.title##',
+                'content_text' => "##opencitaseg.citedby## があなたの回答を引用しました"
+                    . " (##opencitaseg.citedate##).\n\n"
+                    . "##lang.%TYPE%.title## : ##%TYPE%.title##\n"
+                    . "##lang.%TYPE%.url## : ##%TYPE%.url##\n",
+                'content_html' => '<p>##opencitaseg.citedby## があなたの回答を引用しました'
+                    . " (##opencitaseg.citedate##).</p>\n"
+                    . "<p>##lang.%TYPE%.title## : ##%TYPE%.title##</p>\n"
+                    . '<p><a href="##%TYPE%.url##">##%TYPE%.url##</a></p>',
+            ],
         ];
 
         // es_ES y en_GB comparten texto con es_AR / la traducción por defecto.
