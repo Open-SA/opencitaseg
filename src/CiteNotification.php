@@ -142,7 +142,7 @@ final class CiteNotification
         $target->addTarget(
             self::CITED_FOLLOWUP_AUTHOR,
             __('Author of the quoted follow-up', 'opencitaseg'),
-            Notification::USER_TYPE
+            Notification::USER_TYPE,
         );
     }
 
@@ -293,7 +293,7 @@ final class CiteNotification
                     'citedate' => Html::convDateTime($source->fields['date'] ?? null),
                 ],
             ],
-            $source
+            $source,
         );
     }
 

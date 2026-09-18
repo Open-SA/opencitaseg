@@ -56,7 +56,7 @@ function plugin_init_opencitaseg(): void
 
 
     Plugin::registerClass(\GlpiPlugin\Opencitaseg\Config::class, [
-    'addtabon' => ['Entity'],
+        'addtabon' => ['Entity'],
     ]);
 
     foreach (CiteNotification::getTargetClasses() as $targetClass) {

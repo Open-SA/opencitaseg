@@ -57,7 +57,7 @@ function plugin_opencitaseg_install()
                     ADD COLUMN `itemtype_target` varchar(100) NOT NULL DEFAULT 'ITILFollowup'
                         COMMENT 'Clase del objeto citado'
                     AFTER `itilfollowups_id_source`",
-                $DB->error()
+                $DB->error(),
             );
         }
 
@@ -66,7 +66,7 @@ function plugin_opencitaseg_install()
                 "ALTER TABLE `$table`
                     CHANGE COLUMN `itilfollowups_id_target` `items_id_target`
                         bigint unsigned NOT NULL COMMENT 'ID del objeto citado'",
-                $DB->error()
+                $DB->error(),
             );
         }
     }
@@ -94,7 +94,7 @@ function plugin_opencitaseg_install()
                 ADD COLUMN `is_active_tasks` tinyint NOT NULL DEFAULT 1
                     COMMENT 'Citas habilitadas sobre tareas'
                 AFTER `is_active`",
-            $DB->error()
+            $DB->error(),
         );
     }
 
@@ -102,7 +102,7 @@ function plugin_opencitaseg_install()
         "INSERT IGNORE INTO `$configTable`
             (`entities_id`, `use_parent_config`, `is_active`, `default_private`)
          VALUES (0, 0, 1, 0)",
-        $DB->error()
+        $DB->error(),
     );
 
     if (! CiteNotification::install()) {
@@ -162,7 +162,7 @@ function plugin_opencitaseg_item_add(object $item)
     if (
         ! \GlpiPlugin\Opencitaseg\Config::isActiveForItem(
             (string) $item->fields['itemtype'],
-            (int) $item->fields['items_id']
+            (int) $item->fields['items_id'],
         )
     ) {
         return;
@@ -172,7 +172,7 @@ function plugin_opencitaseg_item_add(object $item)
         ! \GlpiPlugin\Opencitaseg\Config::acceptsQuote(
             (string) $item->fields['itemtype'],
             (int) $item->fields['items_id'],
-            $targetType
+            $targetType,
         )
     ) {
         return;
@@ -206,7 +206,7 @@ function plugin_opencitaseg_pre_item_add(object $item)
 
     $target = Cite::loadQuotable(
         (string) ($item->input['_quoted_itemtype'] ?? 'ITILFollowup'),
-        (int) $item->input['_quoted_followup_id']
+        (int) $item->input['_quoted_followup_id'],
     );
 
     if ($target === null) {
