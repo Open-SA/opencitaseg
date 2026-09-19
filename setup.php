@@ -30,7 +30,7 @@
 
 use GlpiPlugin\Opencitaseg\CiteNotification;
 
-define('PLUGIN_OPENCITASEG_VERSION', '1.2.0');
+define('PLUGIN_OPENCITASEG_VERSION', '11.2.0');
 
 define("PLUGIN_OPENCITASEG_MIN_GLPI_VERSION", "11.0.0");
 
@@ -56,7 +56,7 @@ function plugin_init_opencitaseg(): void
 
 
     Plugin::registerClass(\GlpiPlugin\Opencitaseg\Config::class, [
-    'addtabon' => ['Entity'],
+        'addtabon' => ['Entity'],
     ]);
 
     foreach (CiteNotification::getTargetClasses() as $targetClass) {
