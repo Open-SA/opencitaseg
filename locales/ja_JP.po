@@ -1,7 +1,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: opencitaseg 1.2.0\n"
+"Project-Id-Version: opencitaseg 11.2.0\n"
 "Report-Msgid-Bugs-To: https://github.com/Open-SA/opencitaseg/issues\n"
 "POT-Creation-Date: \n"
 "PO-Revision-Date: \n"
@@ -34,3 +34,66 @@ msgstr "ユーザー"
 msgid "Follow-up quote"
 msgid_plural "Follow-up quotes"
 msgstr[0] "回答を引用"
+
+#, fuzzy
+msgid "Follow-up quoted"
+msgstr "回答を引用"
+
+#, fuzzy
+msgid "Author of the quoted follow-up"
+msgstr "この回答を引用"
+
+#, fuzzy
+msgid "User who quoted the follow-up"
+msgstr "この回答を引用"
+
+msgid "Date of the quote"
+msgstr "Fecha de la cita"
+
+msgid "Unknown user"
+msgstr "Usuario desconocido"
+
+#. Entity config: whether the entity inherits its parent's settings.
+msgid "Inherit from parent entity"
+msgstr ""
+
+#. Entity config: master switch for the quote feature.
+msgid "Enable quotes"
+msgstr ""
+
+#. Entity config: initial value of is_private on a new quote.
+msgid "Quotes private by default"
+msgstr ""
+
+#. Notice shown when the entity inherits an enabled configuration.
+msgid "Quotes are currently enabled through inheritance."
+msgstr ""
+
+#. Notice shown when the entity inherits a disabled configuration.
+msgid "Quotes are currently disabled through inheritance."
+msgstr ""
+
+#. Tooltip of the quote button on a task.
+#, fuzzy
+msgid "Quote this task"
+msgstr "この回答を引用"
+
+#. Tooltip on the private checkbox when the quoted item is private.
+msgid "The quoted item is private, so this reply will be private too"
+msgstr ""
+
+#. Entity config: master switch for quoting tasks.
+msgid "Enable quotes on tasks"
+msgstr ""
+
+msgid "Quotes on follow-ups are enabled through inheritance."
+msgstr ""
+
+msgid "Quotes on follow-ups are disabled through inheritance."
+msgstr ""
+
+msgid "Quotes on tasks are enabled through inheritance."
+msgstr ""
+
+msgid "Quotes on tasks are disabled through inheritance."
+msgstr ""
