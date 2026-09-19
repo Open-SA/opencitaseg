@@ -61,13 +61,6 @@ msgstr "Habilitar citas de seguimientos"
 msgid "Quotes private by default"
 msgstr "Citas privadas por defecto"
 
-#. Notice shown when the entity inherits an enabled configuration.
-msgid "Quotes are currently enabled through inheritance."
-msgstr "Las citas están habilitadas por herencia."
-
-#. Notice shown when the entity inherits a disabled configuration.
-msgid "Quotes are currently disabled through inheritance."
-msgstr "Las citas están deshabilitadas por herencia."
 
 #. Tooltip of the quote button on a task.
 msgid "Quote this task"

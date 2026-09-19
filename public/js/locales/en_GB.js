@@ -13,8 +13,6 @@ window.OPENCITASEG_I18N = {
   "Quote": "Quote",
   "Quote this followup": "Quote this followup",
   "Quote this task": "Quote this task",
-  "Quotes are currently disabled through inheritance.": "Quotes are currently disabled through inheritance.",
-  "Quotes are currently enabled through inheritance.": "Quotes are currently enabled through inheritance.",
   "Quotes on follow-ups are disabled through inheritance.": "Quotes on follow-ups are disabled through inheritance.",
   "Quotes on follow-ups are enabled through inheritance.": "Quotes on follow-ups are enabled through inheritance.",
   "Quotes on tasks are disabled through inheritance.": "Quotes on tasks are disabled through inheritance.",

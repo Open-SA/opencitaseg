@@ -65,14 +65,6 @@ msgstr ""
 msgid "Quotes private by default"
 msgstr ""
 
-#. Notice shown when the entity inherits an enabled configuration.
-msgid "Quotes are currently enabled through inheritance."
-msgstr ""
-
-#. Notice shown when the entity inherits a disabled configuration.
-msgid "Quotes are currently disabled through inheritance."
-msgstr ""
-
 #. Tooltip of the quote button on a task.
 #, fuzzy
 msgid "Quote this task"

@@ -13,8 +13,6 @@ window.OPENCITASEG_I18N = {
   "Quote": "Citar",
   "Quote this followup": "Citar este seguimiento",
   "Quote this task": "Citar esta tarea",
-  "Quotes are currently disabled through inheritance.": "Las citas están deshabilitadas por herencia.",
-  "Quotes are currently enabled through inheritance.": "Las citas están habilitadas por herencia.",
   "Quotes on follow-ups are disabled through inheritance.": "Las citas en seguimientos están deshabilitadas por herencia.",
   "Quotes on follow-ups are enabled through inheritance.": "Las citas en seguimientos están habilitadas por herencia.",
   "Quotes on tasks are disabled through inheritance.": "Las citas en tareas están deshabilitadas por herencia.",
