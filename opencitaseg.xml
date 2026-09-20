@@ -22,9 +22,9 @@
    </authors>
    <versions>
       <version>
-         <num>10.2.0</num>
+         <num>10.2.1</num>
          <compatibility>~10.0.0</compatibility>
-         <download_url>https://github.com/Open-SA/opencitaseg/releases/download/10.2.0/opencitaseg-10.2.0.tar.gz</download_url>
+         <download_url>https://github.com/Open-SA/opencitaseg/releases/download/10.2.1/opencitaseg-10.2.1.tar.gz</download_url>
       </version>
    </versions>
    <langs>

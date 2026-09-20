@@ -69,6 +69,18 @@ document.addEventListener("DOMContentLoaded", function () {
     return { itemtype, itemsId };
   }
 
+  // La ruta base se deriva del src de este mismo script: GLPI instala los
+  // plugins del marketplace en marketplace/ y no en plugins/, asi que
+  // hardcodear /plugins/ rompe esa instalacion.
+  function rutaBasePlugin() {
+    const script = document.querySelector(
+      'script[src*="opencitaseg"][src*="citas.js"]',
+    );
+    if (!script) return null;
+
+    return script.src.replace(/\/(public\/)?js\/citas\.js.*$/, "");
+  }
+
   // Citas de versiones anteriores del plugin, que no llevaban la clase
   // opencitaseg-quote. Se reconocen por el borde izquierdo del estilo inline,
   // que se mantuvo igual en todas las generaciones del markup.
@@ -211,9 +223,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
     resolucionEnCurso = true;
 
+    const base = rutaBasePlugin();
+    if (!base) {
+      citasHabilitadas = { seguimientos: true, tareas: true };
+      inyectarBotones();
+      return;
+    }
+
     fetch(
-      (window.CFG_GLPI?.root_doc ?? "") +
-        "/plugins/opencitaseg/ajax/isactive.php?itemtype=" +
+      base +
+        "/ajax/isactive.php?itemtype=" +
         encodeURIComponent(contexto.itemtype) +
         "&items_id=" +
         encodeURIComponent(contexto.itemsId),
