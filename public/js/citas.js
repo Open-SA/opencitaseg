@@ -45,12 +45,22 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function contextoItil() {
     const form = document.querySelector("#new-ITILFollowup-block form");
-    if (!form) return null;
+    if (form) {
+      const itemtype = form.querySelector('input[name="itemtype"]')?.value;
+      const itemsId = form.querySelector('input[name="items_id"]')?.value;
+      if (itemtype && itemsId) return { itemtype, itemsId };
+    }
 
-    const itemtype = form.querySelector('input[name="itemtype"]')?.value;
-    const itemsId = form.querySelector('input[name="items_id"]')?.value;
+    // Desde GLPI 11.0.9 el formulario de respuesta no esta en el DOM hasta que
+    // el usuario abre el panel, asi que no sirve como fuente del contexto. El
+    // formulario principal del objeto ITIL si esta, y lleva los mismos hidden.
+    const principal = document.getElementById("new-itilobject-form");
+    if (!principal) return null;
 
+    const itemtype = principal.querySelector('input[name="itemtype"]')?.value;
+    const itemsId = principal.querySelector('input[name="items_id"]')?.value;
     if (!itemtype || !itemsId) return null;
+
     return { itemtype, itemsId };
   }
 
