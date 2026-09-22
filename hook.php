@@ -30,7 +30,6 @@
 
 use GlpiPlugin\Opencitaseg\Cite;
 use GlpiPlugin\Opencitaseg\CiteNotification;
-use ITILFollowup;
 
 function plugin_opencitaseg_install()
 {
