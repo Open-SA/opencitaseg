@@ -281,6 +281,9 @@ final class CiteNotification
         // GLPI 11.
         $authorName = htmlspecialchars($authorName, ENT_QUOTES, 'UTF-8');
 
+        // GLPI 10 no acepta el objeto emisor: su cuarto parametro es $label
+        // (string). En GLPI 11 la firma es ($event, $item, $options, $trigger,
+        // $label) y ahi si se pasa $source. No unificar sin revisar la firma.
         NotificationEvent::raiseEvent(
             self::EVENT,
             $mainItem,
@@ -292,8 +295,7 @@ final class CiteNotification
                     'citedby'  => $authorName,
                     'citedate' => Html::convDateTime($source->fields['date'] ?? null),
                 ],
-            ],
-            $source
+            ]
         );
     }
 
