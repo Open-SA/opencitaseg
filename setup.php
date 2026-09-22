@@ -30,8 +30,10 @@
 
 use GlpiPlugin\Opencitaseg\CiteNotification;
 
-define('PLUGIN_OPENCITASEG_VERSION', '10.2.1');
+define('PLUGIN_OPENCITASEG_VERSION', '10.2.2');
+
 define("PLUGIN_OPENCITASEG_MIN_GLPI_VERSION", "10.0.0");
+
 define("PLUGIN_OPENCITASEG_MAX_GLPI_VERSION", "10.0.99");
 
 /**
