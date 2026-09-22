@@ -35,57 +35,53 @@ msgid "Follow-up quote"
 msgid_plural "Follow-up quotes"
 msgstr[0] "回答を引用"
 
-#, fuzzy
 msgid "Follow-up quoted"
-msgstr "回答を引用"
+msgstr "引用して回答"
 
-#, fuzzy
 msgid "Author of the quoted follow-up"
-msgstr "この回答を引用"
+msgstr "引用回答者"
 
-#, fuzzy
 msgid "User who quoted the follow-up"
-msgstr "この回答を引用"
+msgstr "回答を引用したユーザー"
 
 msgid "Date of the quote"
-msgstr "Fecha de la cita"
+msgstr "引用日"
 
 msgid "Unknown user"
-msgstr "Usuario desconocido"
+msgstr "不明なユーザー"
 
 #. Entity config: whether the entity inherits its parent's settings.
 msgid "Inherit from parent entity"
-msgstr ""
+msgstr "上位エンティティーから継承"
 
 #. Entity config: master switch for the quote feature.
 msgid "Enable quotes"
-msgstr ""
+msgstr "引用を有効に"
 
 #. Entity config: initial value of is_private on a new quote.
 msgid "Quotes private by default"
-msgstr ""
+msgstr "引用をデフォルトで非公開に"
 
 #. Tooltip of the quote button on a task.
-#, fuzzy
 msgid "Quote this task"
-msgstr "この回答を引用"
+msgstr "このタスクを引用"
 
 #. Tooltip on the private checkbox when the quoted item is private.
 msgid "The quoted item is private, so this reply will be private too"
-msgstr ""
+msgstr "引用したアイテムは非公開で、この応答も非公開になります"
 
 #. Entity config: master switch for quoting tasks.
 msgid "Enable quotes on tasks"
-msgstr ""
+msgstr "タスクでの引用を有効に"
 
 msgid "Quotes on follow-ups are enabled through inheritance."
-msgstr ""
+msgstr "回答での引用は継承により有効です。"
 
 msgid "Quotes on follow-ups are disabled through inheritance."
-msgstr ""
+msgstr "回答での引用は継承により無効です。"
 
 msgid "Quotes on tasks are enabled through inheritance."
-msgstr ""
+msgstr "タスクでの引用は継承により有効です。"
 
 msgid "Quotes on tasks are disabled through inheritance."
-msgstr ""
+msgstr "タスクでの引用は継承により無効です。"
