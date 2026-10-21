@@ -329,6 +329,40 @@ document.addEventListener("DOMContentLoaded", function () {
     );
   }
 
+  // Llama a onReady(form) cuando el formulario de respuesta esta en el DOM.
+  //
+  // Desde GLPI 11.0.9 el formulario se trae por AJAX la primera vez que se
+  // abre el panel, y el shown.bs.collapse llega al terminar la animacion,
+  // muchas veces antes que esa respuesta. Sin esperar, la primera cita de la
+  // pagina no se insertaba: recien andaba con el panel ya abierto una vez.
+  // 50 intentos de 100 ms porque el AJAX puede tardar bastante mas que la
+  // animacion en un servidor cargado.
+  //
+  // Si no existe ni el panel, GLPI no ofrece responder y no hay nada que
+  // esperar.
+  function esperarFormulario(onReady, onTimeout, intentosRestantes = 50) {
+    if (!document.getElementById("new-ITILFollowup-block")) {
+      onTimeout();
+      return;
+    }
+
+    const form = document.querySelector("#new-ITILFollowup-block form");
+    if (form) {
+      onReady(form);
+      return;
+    }
+
+    if (intentosRestantes <= 0) {
+      onTimeout();
+      return;
+    }
+
+    setTimeout(
+      () => esperarFormulario(onReady, onTimeout, intentosRestantes - 1),
+      100,
+    );
+  }
+
   let citaOperacionEnCurso = false;
 
   document.body.addEventListener("click", function (e) {
@@ -381,16 +415,10 @@ document.addEventListener("DOMContentLoaded", function () {
       ? elementoCitado.querySelector(".is-private") !== null
       : false;
 
-    const insertarCita = () => {
-      const formularioRespuesta = document.querySelector(
-        "#new-ITILFollowup-block form",
-      );
+    const insertarCita = () =>
+      esperarFormulario(insertarEnFormulario, liberarGuard);
 
-      if (!formularioRespuesta) {
-        liberarGuard();
-        return;
-      }
-
+    const insertarEnFormulario = (formularioRespuesta) => {
       aplicarPrivacidadPorDefecto(formularioRespuesta, citadoEsPrivado);
 
       let inputOculto = formularioRespuesta.querySelector(
@@ -462,7 +490,7 @@ document.addEventListener("DOMContentLoaded", function () {
         (editor) => {
           document
             .getElementById("new-itilobject-form")
-            .scrollIntoView({ behavior: "smooth", block: "center" });
+            ?.scrollIntoView({ behavior: "smooth", block: "center" });
 
           editor.focus();
           quitarCitasDelEditor(editor);
