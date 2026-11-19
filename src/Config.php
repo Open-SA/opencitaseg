@@ -174,6 +174,8 @@ class Config extends CommonDBTM
 
     public static function showForEntity(int $entities_id): void
     {
+        global $CFG_GLPI;
+
         $config = new self();
         $exists = $config->getFromDBByCrit(['entities_id' => $entities_id]);
 
@@ -201,7 +203,7 @@ class Config extends CommonDBTM
                 : ($exists ? (int) $config->fields['default_private'] : 0),
             'resolved'          => $resuelto,
             'can_update'        => Session::haveRight(self::$rightname, UPDATE),
-            'save_url'          => \Plugin::getWebDir('opencitaseg') . '/front/config.form.php',
+            'save_url'          => $CFG_GLPI['root_doc'] . '/plugins/opencitaseg/front/config.form.php',
         ]);
     }
 
