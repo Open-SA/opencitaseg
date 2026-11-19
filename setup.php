@@ -44,8 +44,6 @@ function plugin_init_opencitaseg(): void
 {
     global $PLUGIN_HOOKS;
 
-    $PLUGIN_HOOKS['csrf_compliant']['opencitaseg'] = true;
-
     $PLUGIN_HOOKS['item_add']['opencitaseg'] = [
         'ITILFollowup' => 'plugin_opencitaseg_item_add',
     ];
