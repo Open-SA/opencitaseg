@@ -12,7 +12,7 @@ use CommonITILTask;
 
 class Config extends CommonDBTM
 {
-    public static $rightname = 'entity';
+    public static string $rightname = 'entity';
 
     private static array $resolved = [];
 
