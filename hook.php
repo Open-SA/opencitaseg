@@ -48,24 +48,22 @@ function plugin_opencitaseg_install()
             KEY `target` (`itemtype_target`, `items_id_target`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
 
-        $DB->doQueryOrDie($query, $DB->error());
+        $DB->doQuery($query);
     } else {
         if (! $DB->fieldExists($table, 'itemtype_target')) {
-            $DB->doQueryOrDie(
+            $DB->doQuery(
                 "ALTER TABLE `$table`
                     ADD COLUMN `itemtype_target` varchar(100) NOT NULL DEFAULT 'ITILFollowup'
                         COMMENT 'Clase del objeto citado'
                     AFTER `itilfollowups_id_source`",
-                $DB->error(),
             );
         }
 
         if ($DB->fieldExists($table, 'itilfollowups_id_target')) {
-            $DB->doQueryOrDie(
+            $DB->doQuery(
                 "ALTER TABLE `$table`
                     CHANGE COLUMN `itilfollowups_id_target` `items_id_target`
                         bigint unsigned NOT NULL COMMENT 'ID del objeto citado'",
-                $DB->error(),
             );
         }
     }
@@ -84,24 +82,22 @@ function plugin_opencitaseg_install()
             UNIQUE KEY `entities_id` (`entities_id`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
 
-        $DB->doQueryOrDie($query, $DB->error());
+        $DB->doQuery($query);
     }
 
     if (! $DB->fieldExists($configTable, 'is_active_tasks')) {
-        $DB->doQueryOrDie(
+        $DB->doQuery(
             "ALTER TABLE `$configTable`
                 ADD COLUMN `is_active_tasks` tinyint NOT NULL DEFAULT 1
                     COMMENT 'Citas habilitadas sobre tareas'
                 AFTER `is_active`",
-            $DB->error(),
         );
     }
 
-    $DB->doQueryOrDie(
+    $DB->doQuery(
         "INSERT IGNORE INTO `$configTable`
             (`entities_id`, `use_parent_config`, `is_active`, `default_private`)
          VALUES (0, 0, 1, 0)",
-        $DB->error(),
     );
 
     if (! CiteNotification::install()) {
@@ -117,7 +113,7 @@ function plugin_opencitaseg_uninstall()
 
     foreach (['glpi_plugin_opencitaseg_cites', 'glpi_plugin_opencitaseg_configs'] as $table) {
         if ($DB->tableExists($table)) {
-            $DB->doQueryOrDie("DROP TABLE `$table`", $DB->error());
+            $DB->doQuery("DROP TABLE `$table`");
         }
     }
 
