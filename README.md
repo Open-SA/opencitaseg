@@ -18,8 +18,8 @@ Allows quoting ITIL follow-ups and tasks in GLPI changes, problems and tickets w
 
 | Requirement | Version |
 | :--- | :--- |
-| **GLPI** | `>= 11.0.0, < 12.0.0` |
-| **PHP** | `>= 8.2` |
+| **GLPI** | `>= 12.0.0, < 12.1.0` |
+| **PHP** | `>= 8.3` |
 
 ## Installation
 
