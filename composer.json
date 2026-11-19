@@ -3,7 +3,7 @@
   "description": "Plugin para GLPI que permite citar seguimientos.",
   "license": "GPL-2.0-or-later",
   "require": {
-    "php": ">=8.2"
+    "php": ">=8.3"
   },
   "require-dev": {
     "friendsofphp/php-cs-fixer": "^3.95",
@@ -15,7 +15,7 @@
   "config": {
     "optimize-autoloader": true,
     "platform": {
-      "php": "8.2.0"
+      "php": "8.3.0"
     },
     "sort-packages": true
   },
