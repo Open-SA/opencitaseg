@@ -166,6 +166,20 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
+  function esParrafoVacio(nodo) {
+    return (
+      nodo.tagName === "P" &&
+      nodo.textContent.replace(/\u00a0/g, "").trim() === "" &&
+      !nodo.querySelector("img")
+    );
+  }
+
+  function escaparHtml(texto) {
+    const div = document.createElement("div");
+    div.textContent = texto;
+    return div.innerHTML;
+  }
+
   function inyectarBotones() {
     if (citasHabilitadas === null) return;
 
@@ -466,15 +480,13 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
       const etiquetaCita = t("Quoting %s").replace("%s", autorCita);
-      const htmlCita = `
-                    <blockquote contenteditable="false" class="mceNonEditable opencitaseg-quote" style="border-left: 3px solid #0078d4; padding-left: 10px; margin-left: 0; color: #555; background-color: #f8f9fa; padding: 10px; border-radius: 4px; user-select: none;">
-                        <strong><a href="#${itemtypeCitado}_${idSeguimiento}" class="opencitaseg-quote-link" style="text-decoration: none; color: #0078d4;">
-                            <i class="ti ti-link"></i> ${etiquetaCita}
-                        </a>:</strong><br>
-                        ${textoCitado}
-                    </blockquote>
-                    <p>&nbsp;</p>
-                `;
+      const htmlCita =
+        '<blockquote contenteditable="false" class="mceNonEditable opencitaseg-quote" style="border-left: 3px solid #0078d4; padding-left: 10px; margin-left: 0; color: #555; background-color: #f8f9fa; padding: 10px; border-radius: 4px; user-select: none;">' +
+        '<p style="margin: 0 0 6px;"><strong>' +
+        `<a href="#${itemtypeCitado}_${idSeguimiento}" class="opencitaseg-quote-link" style="text-decoration: none; color: #0078d4;">${escaparHtml(etiquetaCita)}</a>:` +
+        "</strong></p>" +
+        textoCitado.trim() +
+        "</blockquote>";
 
       const textarea = formularioRespuesta.querySelector(
         'textarea[name="content"]',
@@ -497,7 +509,24 @@ document.addEventListener("DOMContentLoaded", function () {
           limpiarParrafosVaciosIniciales(editor);
           editor.selection.setCursorLocation(editor.getBody(), 0);
           editor.execCommand("mceInsertContent", false, htmlCita);
-          editor.selection.collapse(false);
+
+          // Un solo parrafo vacio despues de la cita, sin &nbsp;, con el
+          // cursor adentro (mismo arreglo que la 11.3.1).
+          const bloqueCita = editor
+            .getBody()
+            .querySelector("blockquote.opencitaseg-quote");
+          if (bloqueCita) {
+            while (
+              bloqueCita.nextElementSibling &&
+              esParrafoVacio(bloqueCita.nextElementSibling)
+            ) {
+              bloqueCita.nextElementSibling.remove();
+            }
+            const linea = editor.dom.create("p", {}, '<br data-mce-bogus="1">');
+            editor.dom.insertAfter(linea, bloqueCita);
+            editor.selection.setCursorLocation(linea, 0);
+            editor.undoManager.add();
+          }
 
           liberarGuard();
         },
