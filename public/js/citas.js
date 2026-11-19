@@ -103,7 +103,16 @@ document.addEventListener("DOMContentLoaded", function () {
     const doc = new DOMParser().parseFromString(html, "text/html");
 
     doc.body.querySelectorAll("blockquote").forEach((cita) => {
-      if (esCitaDelPlugin(cita)) cita.remove();
+      if (!esCitaDelPlugin(cita)) return;
+
+      // El template anterior agregaba un <p>&nbsp;</p> despues de cada cita:
+      // si queda, el contenido podado arranca con una linea en blanco.
+      const siguiente = cita.nextElementSibling;
+      if (siguiente && esParrafoVacio(siguiente)) {
+        siguiente.remove();
+      }
+
+      cita.remove();
     });
 
     if (doc.body.textContent.trim() === "" && !doc.body.querySelector("img")) {
