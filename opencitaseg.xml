@@ -24,6 +24,11 @@
    </authors>
    <versions>
       <version>
+         <num>12.2.1</num>
+         <compatibility>~12.0.0</compatibility>
+         <download_url>https://github.com/Open-SA/opencitaseg/releases/download/12.2.1/opencitaseg-12.2.1.tar.gz</download_url>
+      </version>
+      <version>
          <num>11.2.3</num>
          <compatibility>~11.0.0</compatibility>
          <download_url>https://github.com/Open-SA/opencitaseg/releases/download/11.2.3/opencitaseg-11.2.3.tar.gz</download_url>
